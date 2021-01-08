@@ -52,8 +52,6 @@ set(SOURCE_FILES
     src/Circle.h
     src/CmdLineUtils.cpp
     src/CmdLineUtils.h
-    src/CompositeTexture.cpp
-    src/CompositeTexture.h
     src/DrawableText.h
     src/Event.cpp
     src/Event.h
@@ -187,8 +185,6 @@ set(SOURCE_FILES
     src/Parser/ParseButton.h
     src/Parser/ParseCircle.cpp
     src/Parser/ParseCircle.h
-    src/Parser/ParseCompositeTexture.cpp
-    src/Parser/ParseCompositeTexture.h
     src/Parser/ParseCondition.cpp
     src/Parser/ParseCondition.h
     src/Parser/ParseCursor.cpp
@@ -294,6 +290,8 @@ set(SOURCE_FILES
     src/TexturePacks/BitmapFontTexturePack.h
     src/TexturePacks/CachedTexturePack.cpp
     src/TexturePacks/CachedTexturePack.h
+    src/TexturePacks/CompositeTexturePack.cpp
+    src/TexturePacks/CompositeTexturePack.h
     src/TexturePacks/IndexedTexturePack.cpp
     src/TexturePacks/IndexedTexturePack.h
     src/TexturePacks/RectTexturePack.cpp
@@ -319,6 +317,7 @@ set(SOURCE_FILES
     src/Utils/UnorderedStringMap.h
     src/Utils/Utils.cpp
     src/Utils/Utils.h
+    src/Utils/Vector2D.h
 )
 
 if(FFmpeg_FOUND)
