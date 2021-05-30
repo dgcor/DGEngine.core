@@ -1,4 +1,5 @@
 #include "ParseCircle.h"
+#include <cassert>
 #include "Circle.h"
 #include "Game.h"
 #include "GameUtils.h"
@@ -10,18 +11,8 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseCircle(Game& game, const Value& elem)
+	std::shared_ptr<Circle> getCircleObj(Game& game, const Value& elem)
 	{
-		if (isValidString(elem, "id") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		auto circle = std::make_shared<Circle>((float)getIntKey(elem, "radius"));
 
 		if (isValidString(elem, "texture"))
@@ -55,6 +46,30 @@ namespace Parser
 		circle->setOutlineColor(getColorKey(elem, "outlineColor", sf::Color::White));
 		circle->setOutlineThickness((float)getUIntKey(elem, "outlineThickness"));
 
+		return circle;
+	}
+
+	void parseCircle(Game& game, const Value& elem,
+		const getCircleObjFuncPtr getCircleObjFunc)
+	{
+		assert(getCircleObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto circle = getCircleObjFunc(game, elem);
+		if (circle == nullptr)
+		{
+			return;
+		}
+
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
 		{
@@ -69,5 +84,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, circle, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseCircle(Game& game, const Value& elem)
+	{
+		parseCircle(game, elem, getCircleObj);
 	}
 }

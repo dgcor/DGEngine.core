@@ -18,7 +18,7 @@ public:
 	Image(const sf::Texture& tex);
 	Image(const sf::Texture& tex, const std::shared_ptr<Palette>& pal);
 	Image(const TextureInfo& ti);
-	Image(const std::vector<TextureInfo>& ti);
+	Image(const std::vector<TextureInfo>& ti, bool drawAfter = false);
 
 	bool Resizable() const noexcept { return resizable; }
 	void Resizable(bool resizable_) noexcept { resizable = resizable_; }
@@ -55,7 +55,7 @@ public:
 
 	void setTexture(const sf::Texture& texture, bool resetRect = false);
 	void setTexture(const TextureInfo& ti);
-	void setTexture(const std::vector<TextureInfo>& ti);
+	void setTexture(const std::vector<TextureInfo>& ti, bool drawAfter = false);
 	void setTexture(const TextureInfoVar& ti);
 	void setTextureRect(const sf::IntRect& rectangle) { sprite.setTextureRect(rectangle); }
 

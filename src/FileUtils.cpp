@@ -1,8 +1,9 @@
 #include "FileUtils.h"
 #include <cstring>
 #include <filesystem>
-#include <memory>
 #include <fstream>
+#include "Hooks.h"
+#include <memory>
 #include "SFML/PhysFSStream.h"
 #include "Utils/Utils.h"
 
@@ -14,6 +15,10 @@ namespace FileUtils
 		deinitPhysFS();
 		if (PHYSFS_init(mainArgv0) != 0)
 		{
+			if (Hooks::RegisterArchivers != nullptr)
+			{
+				Hooks::RegisterArchivers();
+			}
 			PHYSFS_permitSymbolicLinks(1);
 		}
 	}
@@ -45,15 +50,13 @@ namespace FileUtils
 					return true;
 				}
 			}
-			path = path.replace_extension(".zip");
-			if (std::filesystem::exists(path) == true)
+			for (const auto& ext : Hooks::ArchiveExtensions)
 			{
-				return true;
-			}
-			path = path.replace_extension(".7z");
-			if (std::filesystem::exists(path) == true)
-			{
-				return true;
+				path = path.replace_extension(ext);
+				if (std::filesystem::exists(path) == true)
+				{
+					return true;
+				}
 			}
 		}
 		catch (std::exception&) {}
@@ -81,15 +84,13 @@ namespace FileUtils
 					return true;
 				}
 			}
-			path = path.replace_extension(".zip");
-			if (PHYSFS_mount((const char*)path.u8string().c_str(), mountPoint.data(), append) != 0)
+			for (const auto& ext : Hooks::ArchiveExtensions)
 			{
-				return true;
-			}
-			path = path.replace_extension(".7z");
-			if (PHYSFS_mount((const char*)path.u8string().c_str(), mountPoint.data(), append) != 0)
-			{
-				return true;
+				path = path.replace_extension(ext);
+				if (PHYSFS_mount((const char*)path.u8string().c_str(), mountPoint.data(), append) != 0)
+				{
+					return true;
+				}
 			}
 		}
 		catch (std::exception&) {}
@@ -115,15 +116,13 @@ namespace FileUtils
 					return true;
 				}
 			}
-			path = path.replace_extension(".zip");
-			if (PHYSFS_unmount((const char*)path.u8string().c_str()) != 0)
+			for (const auto& ext : Hooks::ArchiveExtensions)
 			{
-				return true;
-			}
-			path = path.replace_extension(".7z");
-			if (PHYSFS_unmount((const char*)path.u8string().c_str()) != 0)
-			{
-				return true;
+				path = path.replace_extension(ext);
+				if (PHYSFS_unmount((const char*)path.u8string().c_str()) != 0)
+				{
+					return true;
+				}
 			}
 		}
 		catch (std::exception&) {}

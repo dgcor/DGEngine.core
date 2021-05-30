@@ -6,7 +6,7 @@
 
 class CompositeTexturePack : public TexturePack
 {
-private:
+protected:
 	struct CompositeTextureGroup
 	{
 		uint32_t texturePackStartIdx{ 0 };
@@ -42,7 +42,7 @@ public:
 
 	size_t getTexturePackCount() const noexcept { return texturePacks.size(); }
 
-	uint32_t getCompositeTextureGroupSize() const noexcept { return compositeTextureGroups.size(); }
+	uint32_t getCompositeTextureGroupSize() const noexcept { return (uint32_t)compositeTextureGroups.size(); }
 
 	uint32_t getLayerCount(uint32_t groupIdx) const noexcept;
 

@@ -83,11 +83,8 @@
     <ClCompile Include="src\Formula.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameUtils.cpp" />
-    <ClCompile Include="src\GameUtilsGame.cpp" />
-    <ClCompile Include="src\Game\Level.cpp" />
-    <ClCompile Include="src\Game\LevelSurface.cpp" />
-    <ClCompile Include="src\Game\Save\SaveLevel.cpp" />
     <ClCompile Include="src\Game\Save\SaveUtils.cpp" />
+    <ClCompile Include="src\Hooks.cpp" />
     <ClCompile Include="src\IfCondition.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\ImageContainers\SimpleImageContainer.cpp" />
@@ -96,14 +93,11 @@
     <ClCompile Include="src\InputText.cpp" />
     <ClCompile Include="src\Json\JsonUtils.cpp" />
     <ClCompile Include="src\LoadingScreen.cpp" />
-    <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\Movie2.cpp" />
     <ClCompile Include="src\Palette.cpp" />
     <ClCompile Include="src\Panel.cpp" />
-    <ClCompile Include="src\Parser\Game\ParseLevel.cpp" />
     <ClCompile Include="src\Parser\ParseAction.cpp" />
-    <ClCompile Include="src\Parser\ParseActionGame.cpp" />
     <ClCompile Include="src\Parser\ParseAnimation.cpp" />
     <ClCompile Include="src\Parser\ParseAudio.cpp" />
     <ClCompile Include="src\Parser\ParseAudioCommon.cpp" />
@@ -114,7 +108,6 @@
     <ClCompile Include="src\Parser\ParseEvent.cpp" />
     <ClCompile Include="src\Parser\ParseFile.cpp" />
     <ClCompile Include="src\Parser\ParseFileBytes.cpp" />
-    <ClCompile Include="src\Parser\ParseFileGame.cpp" />
     <ClCompile Include="src\Parser\ParseFont.cpp" />
     <ClCompile Include="src\Parser\ParseIcon.cpp" />
     <ClCompile Include="src\Parser\ParseImage.cpp" />
@@ -129,7 +122,6 @@
     <ClCompile Include="src\Parser\ParsePalette.cpp" />
     <ClCompile Include="src\Parser\ParsePanel.cpp" />
     <ClCompile Include="src\Parser\ParsePredicate.cpp" />
-    <ClCompile Include="src\Parser\ParsePredicateGame.cpp" />
     <ClCompile Include="src\Parser\Parser.cpp" />
     <ClCompile Include="src\Parser\ParseRectangle.cpp" />
     <ClCompile Include="src\Parser\ParseScrollable.cpp" />
@@ -141,8 +133,6 @@
     <ClCompile Include="src\Parser\ParseTexturePack.cpp" />
     <ClCompile Include="src\Parser\ParseVariable.cpp" />
     <ClCompile Include="src\Parser\Utils\ParseUtils.cpp" />
-    <ClCompile Include="src\Parser\Utils\ParseUtilsGameKey.cpp" />
-    <ClCompile Include="src\Parser\Utils\ParseUtilsGameVal.cpp" />
     <ClCompile Include="src\Parser\Utils\ParseUtilsIdx.cpp" />
     <ClCompile Include="src\Parser\Utils\ParseUtilsKey.cpp" />
     <ClCompile Include="src\Parser\Utils\ParseUtilsVal.cpp" />
@@ -190,6 +180,7 @@
     <ClCompile Include="src\SFML\PhysFSStream.cpp" />
     <ClCompile Include="src\SFML\SFMLUtils.cpp" />
     <ClCompile Include="src\SFML\Sprite2.cpp" />
+    <ClCompile Include="src\SFML\Surface.cpp" />
     <ClCompile Include="src\SFML\Text2.cpp" />
     <ClCompile Include="src\SFML\VertexArray2.cpp" />
     <ClCompile Include="src\SFML\VertexShape.cpp" />
@@ -232,7 +223,6 @@
     <ClInclude Include="src\Actions\ActIO.h" />
     <ClInclude Include="src\Actions\Action.h" />
     <ClInclude Include="src\Actions\ActiontList.h" />
-    <ClInclude Include="src\Actions\ActLevel.h" />
     <ClInclude Include="src\Actions\ActLoad.h" />
     <ClInclude Include="src\Actions\ActLoadingScreen.h" />
     <ClInclude Include="src\Actions\ActMenu.h" />
@@ -267,15 +257,10 @@
     <ClInclude Include="src\Formula.h" />
     <ClInclude Include="src\Formulas.h" />
     <ClInclude Include="src\FreeTypeFont.h" />
-    <ClInclude Include="src\GameConstants.h" />
     <ClInclude Include="src\GameUtils.h" />
-    <ClInclude Include="src\GameUtilsGame.h" />
-    <ClInclude Include="src\Game\GameProperties.h" />
-    <ClInclude Include="src\Game\Level.h" />
-    <ClInclude Include="src\Game\LevelSurface.h" />
-    <ClInclude Include="src\Game\Save\SaveLevel.h" />
     <ClInclude Include="src\Game\Save\SaveProperties.h" />
     <ClInclude Include="src\Game\Save\SaveUtils.h" />
+    <ClInclude Include="src\Hooks.h" />
     <ClInclude Include="src\IfCondition.h" />
     <ClInclude Include="src\IgnoreResource.h" />
     <ClInclude Include="src\Image.h" />
@@ -288,9 +273,7 @@
     <ClInclude Include="src\Json\JsonUtils.h" />
     <ClInclude Include="src\Movie2.h" />
     <ClInclude Include="src\Panel.h" />
-    <ClInclude Include="src\Parser\Game\ParseLevel.h" />
     <ClInclude Include="src\Parser\ParseAction.h" />
-    <ClInclude Include="src\Parser\ParseActionGame.h" />
     <ClInclude Include="src\Parser\ParseAnimation.h" />
     <ClInclude Include="src\Parser\ParseAudio.h" />
     <ClInclude Include="src\Parser\ParseAudioCommon.h" />
@@ -301,7 +284,6 @@
     <ClInclude Include="src\Parser\ParseEvent.h" />
     <ClInclude Include="src\Parser\ParseFile.h" />
     <ClInclude Include="src\Parser\ParseFileBytes.h" />
-    <ClInclude Include="src\Parser\ParseFileGame.h" />
     <ClInclude Include="src\Parser\ParseFont.h" />
     <ClInclude Include="src\Parser\ParseIcon.h" />
     <ClInclude Include="src\Parser\ParseImage.h" />
@@ -316,7 +298,6 @@
     <ClInclude Include="src\Parser\ParsePalette.h" />
     <ClInclude Include="src\Parser\ParsePanel.h" />
     <ClInclude Include="src\Parser\ParsePredicate.h" />
-    <ClInclude Include="src\Parser\ParsePredicateGame.h" />
     <ClInclude Include="src\Parser\Parser.h" />
     <ClInclude Include="src\Parser\ParseRectangle.h" />
     <ClInclude Include="src\Parser\ParserProperties.h" />
@@ -329,8 +310,6 @@
     <ClInclude Include="src\Parser\ParseTexturePack.h" />
     <ClInclude Include="src\Parser\ParseVariable.h" />
     <ClInclude Include="src\Parser\Utils\ParseUtils.h" />
-    <ClInclude Include="src\Parser\Utils\ParseUtilsGameKey.h" />
-    <ClInclude Include="src\Parser\Utils\ParseUtilsGameVal.h" />
     <ClInclude Include="src\Parser\Utils\ParseUtilsIdx.h" />
     <ClInclude Include="src\Parser\Utils\ParseUtilsKey.h" />
     <ClInclude Include="src\Parser\Utils\ParseUtilsVal.h" />
@@ -404,6 +383,7 @@
     <ClInclude Include="src\SFML\PhysFSStream.h" />
     <ClInclude Include="src\SFML\SFMLUtils.h" />
     <ClInclude Include="src\SFML\Sprite2.h" />
+    <ClInclude Include="src\SFML\Surface.h" />
     <ClInclude Include="src\SFML\Text2.h" />
     <ClInclude Include="src\SFML\VertexArray2.h" />
     <ClInclude Include="src\SFML\VertexShape.h" />
@@ -451,111 +431,111 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9981E035-E22B-4A7C-BDB4-D9B27A0E5B46}</ProjectGuid>
+    <ProjectGuid>{1B91743F-9C8A-4E06-9950-31D959E5622E}</ProjectGuid>
     <RootNamespace>DGEngine</RootNamespace>
-    <ProjectName>DGEngine</ProjectName>
+    <ProjectName>DGEngine.core</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Code Analysis|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Code Analysis|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NoMovie|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NoMovie|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Clang|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>ClangCL</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Clang|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>ClangCL</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NoMovie|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NoMovie|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static NoMovie|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static NoMovie|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -614,58 +594,58 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Code Analysis|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Code Analysis|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NoMovie|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NoMovie|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Clang|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Clang|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NoMovie|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NoMovie|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static NoMovie|Win32'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Static NoMovie|x64'">
-    <IntDir>Project.dir\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>DGEngine.core.dir\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>true</VcpkgEnabled>

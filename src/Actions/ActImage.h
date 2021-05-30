@@ -183,11 +183,11 @@ class ActImageSetTextureFromPack : public Action
 private:
 	std::string id;
 	std::string idTexturePack;
-	size_t textureIdx;
+	uint32_t textureIdx;
 
 public:
 	ActImageSetTextureFromPack(const std::string_view id_,
-		const std::string_view idTexturePack_, size_t textureIdx_)
+		const std::string_view idTexturePack_, uint32_t textureIdx_)
 		: id(id_), idTexturePack(idTexturePack_), textureIdx(textureIdx_) {}
 
 	bool execute(Game& game) override
@@ -214,11 +214,11 @@ class ActImageSetTextureFromQueryable : public Action
 private:
 	std::string id;
 	std::string query;
-	size_t textureIdx;
+	uint32_t textureIdx;
 
 public:
 	ActImageSetTextureFromQueryable(const std::string_view id_,
-		const std::string_view query_, size_t textureIdx_)
+		const std::string_view query_, uint32_t textureIdx_)
 		: id(id_), query(query_), textureIdx(textureIdx_) {}
 
 	bool execute(Game& game) override

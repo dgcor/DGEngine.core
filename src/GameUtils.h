@@ -5,7 +5,6 @@
 #include "AnimationType.h"
 #include "BindingFlags.h"
 #include "BlendMode.h"
-#include "GameUtilsGame.h"
 #include "IgnoreResource.h"
 #include "InputEvent.h"
 #include "Palette.h"
@@ -51,7 +50,7 @@ namespace GameUtils
 
 	sf::Keyboard::Key getKeyCode(int num, sf::Keyboard::Key val) noexcept;
 
-	// also gets extra keys (casted as sf::Keyboard::Key)
+	// also gets extra keys (cast as sf::Keyboard::Key)
 	sf::Keyboard::Key getKeyCode(const std::string_view str, sf::Keyboard::Key val);
 
 	IgnoreResource getIgnoreResource(const std::string_view str, IgnoreResource val);

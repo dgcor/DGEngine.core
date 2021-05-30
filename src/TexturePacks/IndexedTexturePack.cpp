@@ -84,7 +84,7 @@ void IndexedTexturePack::addAnimatedTexture(uint32_t animIndex,
 	{
 		return;
 	}
-	animatedIndexes[animIndex] = animatedTextures.size();
+	animatedIndexes[animIndex] = (uint32_t)animatedTextures.size();
 	TexturePackAnimation anim;
 	anim.refresh = refresh;
 	anim.indexes = indexes;
@@ -93,7 +93,7 @@ void IndexedTexturePack::addAnimatedTexture(uint32_t animIndex,
 
 void IndexedTexturePack::mapTextureIndex(uint32_t mapIndex)
 {
-	mapTextureIndex(mapIndex, textureIndexes.size());
+	mapTextureIndex(mapIndex, (uint32_t)textureIndexes.size());
 }
 
 void IndexedTexturePack::mapTextureIndex(uint32_t mapIndex, uint32_t toIndex)

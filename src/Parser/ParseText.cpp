@@ -1,6 +1,7 @@
 #include "ParseText.h"
 #include "BindableText.h"
 #include "BitmapText.h"
+#include <cassert>
 #include "DrawableText.h"
 #include "FileUtils.h"
 #include "Game.h"
@@ -97,16 +98,8 @@ namespace Parser
 		if (hasBinding == true)
 		{
 			text.setBinding(getStringVectorKey(elem, "binding"));
-			if (elem.HasMember("text"sv) == false)
-			{
-				text.setFormat(getStringViewKey(elem, "format", "[1]"));
-				text.setBindingFlags(getBindingFlagsKey(elem, "bindingFlags"));
-			}
-			else
-			{
-				text.setFormat(getStringViewKey(elem, "text", "[1]"));
-				text.setBindingFlags(BindingFlags::Once);
-			}
+			text.setFormat(getStringViewKey(elem, "format", "[1]"));
+			text.setBindingFlags(getBindingFlagsKey(elem, "bindingFlags"));
 		}
 		if (elem.HasMember("onChange"sv))
 		{
@@ -118,8 +111,11 @@ namespace Parser
 		}
 	}
 
-	void parseText(Game& game, const Value& elem)
+	void parseText(Game& game, const Value& elem,
+		const getTextObjFuncPtr getTextObjFunc)
 	{
+		assert(getTextObjFunc != nullptr);
+
 		if (isValidString(elem, "id") == false)
 		{
 			return;
@@ -129,6 +125,7 @@ namespace Parser
 		{
 			return;
 		}
+
 		std::shared_ptr<Text> text(getTextObj(game, elem));
 		if (text == nullptr)
 		{
@@ -149,5 +146,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, text, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseText(Game& game, const Value& elem)
+	{
+		parseText(game, elem, getTextObj);
 	}
 }

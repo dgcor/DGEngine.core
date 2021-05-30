@@ -81,7 +81,7 @@ AnimationInfo CachedTexturePack::getAnimation(int32_t groupIdx, int32_t directio
 	AnimationInfo animInfo;
 	animInfo.indexRange = TexturePack::getRange(
 		0,
-		cache.size(),
+		(uint32_t)cache.size(),
 		directionIdx,
 		imgPack->getDirections()
 	);

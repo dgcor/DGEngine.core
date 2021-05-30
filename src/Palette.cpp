@@ -67,13 +67,13 @@ Palette::Palette(const Palette& pal, const std::vector<sf::Uint8> trn,
 void Palette::loadTexture()
 {
 	sf::Image img;
-	img.create(palette.size(), 1, (const sf::Uint8*)&palette);
+	img.create((unsigned)palette.size(), 1, (const sf::Uint8*)&palette);
 	texture.loadFromImage(img);
 }
 
 void Palette::updateTexture()
 {
-	texture.update((const sf::Uint8*)&palette, palette.size(), 1, 0, 0);
+	texture.update((const sf::Uint8*)&palette, (unsigned)palette.size(), 1, 0, 0);
 }
 
 bool Palette::shiftLeft(size_t shift, size_t startIdx, size_t stopIdx)

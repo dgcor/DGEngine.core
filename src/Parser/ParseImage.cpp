@@ -1,4 +1,5 @@
 #include "ParseImage.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include "Image.h"
@@ -10,18 +11,8 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseImage(Game& game, const Value& elem)
+	std::shared_ptr<Image> getImageObj(Game& game, const Value& elem)
 	{
-		if (isValidString(elem, "id") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		std::shared_ptr<Image> image;
 
 		if (isValidString(elem, "texture"))
@@ -29,7 +20,7 @@ namespace Parser
 			auto texture = game.Resources().getTexture(elem["texture"sv].GetStringView());
 			if (texture == nullptr)
 			{
-				return;
+				return nullptr;
 			}
 			image = std::make_shared<Image>(*texture);
 		}
@@ -38,12 +29,12 @@ namespace Parser
 			auto texPack = game.Resources().getTexturePack(elem["texturePack"sv].GetStringView());
 			if (texPack == nullptr)
 			{
-				return;
+				return nullptr;
 			}
 			TextureInfoVar tiVar;
 			if (texPack->get(getUIntKey(elem, "textureIndex"), tiVar) == false)
 			{
-				return;
+				return nullptr;
 			}
 			if (std::holds_alternative<TextureInfo>(tiVar) == true)
 			{
@@ -56,7 +47,7 @@ namespace Parser
 		}
 		else
 		{
-			return;
+			return nullptr;
 		}
 
 		if (elem.HasMember("textureRect"sv))
@@ -97,6 +88,30 @@ namespace Parser
 		image->setOutline(outline, outlineIgnore);
 		image->setOutlineEnabled(getBoolKey(elem, "enableOutline"));
 
+		return image;
+	}
+
+	void parseImage(Game& game, const Value& elem,
+		const getImageObjFuncPtr getImageObjFunc)
+	{
+		assert(getImageObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto image = getImageObjFunc(game, elem);
+		if (image == nullptr)
+		{
+			return;
+		}
+
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
 		{
@@ -111,5 +126,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, image, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseImage(Game& game, const Value& elem)
+	{
+		parseImage(game, elem, getImageObj);
 	}
 }

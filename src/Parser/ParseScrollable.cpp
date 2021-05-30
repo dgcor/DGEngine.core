@@ -1,8 +1,9 @@
 #include "ParseScrollable.h"
-#include "ParseAction.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include "Panel.h"
+#include "ParseAction.h"
 #include "ParseText.h"
 #include "Scrollable.h"
 #include "Utils/ParseUtils.h"
@@ -13,25 +14,9 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseScrollable(Game& game, const Value& elem)
+	std::shared_ptr<Scrollable> getScrollableObj(Game& game, const Value& elem,
+		std::shared_ptr<UIObject>& uiObj)
 	{
-		if (isValidString(elem, "id") == false ||
-			isValidString(elem, "drawable") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
-		auto uiObj = game.Resources().getDrawableSharedPtr<UIObject>(getStringViewVal(elem["drawable"sv]));
-		if (uiObj == nullptr)
-		{
-			return;
-		}
-
 		// scrollable will manage drawing of the UIObject to scroll
 		game.Resources().deleteDrawable(uiObj.get());
 
@@ -62,6 +47,36 @@ namespace Parser
 		{
 			scrollable->setAction(str2int16("complete"), getActionVal(game, elem["onComplete"sv]));
 		}
+		return scrollable;
+	}
+
+	void parseScrollable(Game& game, const Value& elem,
+		const getScrollableObjFuncPtr getScrollableObjFunc)
+	{
+		assert(getScrollableObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false ||
+			isValidString(elem, "drawable") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto uiObj = game.Resources().getDrawableSharedPtr<UIObject>(getStringViewVal(elem["drawable"sv]));
+		if (uiObj == nullptr)
+		{
+			return;
+		}
+
+		auto scrollable = getScrollableObjFunc(game, elem, uiObj);
+		if (scrollable == nullptr)
+		{
+			return;
+		}
 
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
@@ -78,5 +93,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, scrollable, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseScrollable(Game& game, const Value& elem)
+	{
+		parseScrollable(game, elem, getScrollableObj);
 	}
 }

@@ -15,7 +15,17 @@
 
 class Game : public sf::NonCopyable, public Queryable
 {
-private:
+public:
+	static uint32_t DefaultSizeX;
+	static uint32_t DefaultSizeY;
+
+	static uint32_t MinSizeX;
+	static uint32_t MinSizeY;
+
+	static uint32_t RefSizeX;
+	static uint32_t RefSizeY;
+
+protected:
 	sf::RenderWindow window;
 	sf::RenderTexture gameTexture;
 	sf::Sprite gameSprite;
@@ -127,7 +137,7 @@ private:
 
 public:
 	Game();
-	~Game();
+	virtual ~Game();
 
 	void load(const std::string_view gamefilePath, const std::string_view mainFile);
 	void init();
@@ -318,11 +328,25 @@ public:
 	std::shared_ptr<Action> getQueryAction(const std::string_view prop) const;
 
 	bool getProperty(const std::string_view prop, Variable& var) const override;
+
+	virtual bool getProperty(const std::string_view prop1,
+		const std::string_view prop2, Variable& var) const;
+
 	bool getGameProperty(const std::string_view prop, Variable& var) const;
-	void setGameProperty(const std::string_view prop, const Variable& val);
+
+	virtual bool getGameProperty(const std::string_view prop1,
+		const std::string_view prop2, Variable& var) const;
+
+	virtual void setGameProperty(const std::string_view prop, const Variable& val);
 
 	const Queryable* getQueryable(const std::string_view prop) const override;
 
+	virtual const Queryable* getQueryable(const std::string_view prop1,
+		const std::string_view prop2) const;
+
 	std::vector<std::variant<const Queryable*, Variable>> getQueryableList(
 		const std::string_view prop) const;
+
+	virtual bool getQueryableList(const std::string_view prop1, const std::string_view prop2,
+		std::vector<std::variant<const Queryable*, Variable>>& queryableList) const;
 };

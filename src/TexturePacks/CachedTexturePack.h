@@ -6,7 +6,7 @@
 
 class CachedTexturePack : public TexturePack
 {
-private:
+protected:
 	std::shared_ptr<ImageContainer> imgPack;
 	sf::Vector2f offset;
 	std::shared_ptr<Palette> palette;
@@ -26,7 +26,7 @@ public:
 	int32_t getWidth(uint32_t index) const override;
 
 	const std::shared_ptr<Palette>& getPalette() const noexcept override { return palette; }
-	uint32_t size() const noexcept override { return cache.size(); }
+	uint32_t size() const noexcept override { return (uint32_t)cache.size(); }
 
 	uint32_t getDirectionCount(uint32_t groupIdx) const noexcept override;
 	uint32_t getDirection(uint32_t frameIdx) const noexcept override;
@@ -35,7 +35,7 @@ public:
 
 class CachedMultiTexturePack : public TexturePack
 {
-private:
+protected:
 	std::vector<std::shared_ptr<ImageContainer>> imgVec;
 	sf::Vector2f offset;
 	uint32_t textureCount{ 0 };
@@ -58,7 +58,7 @@ public:
 	const std::shared_ptr<Palette>& getPalette() const noexcept override { return palette; }
 	uint32_t size() const noexcept override { return textureCount; }
 
-	uint32_t getGroupCount() const noexcept override { return imgVec.size(); }
+	uint32_t getGroupCount() const noexcept override { return (uint32_t)imgVec.size(); }
 	uint32_t getDirectionCount(uint32_t groupIdx) const noexcept override;
 	uint32_t getDirection(uint32_t frameIdx) const noexcept override;
 	AnimationInfo getAnimation(int32_t groupIdx, int32_t directionIdx) const override;

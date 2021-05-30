@@ -2,7 +2,6 @@
 #include "Button.h"
 #include <cctype>
 #include "Game.h"
-#include "Game/Level.h"
 
 void ResourceManager::addResource(const std::string& id)
 {
@@ -109,15 +108,6 @@ void ResourceManager::bringResourceToFront(const std::string& id)
 	{
 		std::rotate(it, it + 1, resources.end());
 	}
-}
-
-Level* ResourceManager::getLevel(const std::string_view id) const noexcept
-{
-	if (id.empty() == true)
-	{
-		return currentLevel;
-	}
-	return getDrawable<Level>(id);
 }
 
 Image* ResourceManager::getCursor() const

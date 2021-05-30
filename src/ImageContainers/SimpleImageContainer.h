@@ -5,7 +5,7 @@
 
 class SimpleImageContainer : public ImageContainer
 {
-private:
+protected:
 	sf::Image image;
 	uint32_t maxFrames{ 0 };
 	uint32_t numFrames{ 0 };

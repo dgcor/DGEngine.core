@@ -61,7 +61,7 @@ public:
 
 class MultiTexturePack : public TexturePack
 {
-private:
+protected:
 	std::vector<MultiTexture> texVec;
 	uint32_t textureCount{ 0 };
 	uint32_t numFrames{ 0 };
@@ -86,7 +86,7 @@ public:
 	const std::shared_ptr<Palette>& getPalette() const noexcept override { return palette; }
 	uint32_t size() const noexcept override { return textureCount; }
 
-	uint32_t getGroupCount() const noexcept override { return texVec.size(); }
+	uint32_t getGroupCount() const noexcept override { return (uint32_t)texVec.size(); }
 	uint32_t getDirectionCount(uint32_t groupIdx) const noexcept override;
 	uint32_t getDirection(uint32_t frameIdx) const noexcept override;
 	AnimationInfo getAnimation(int32_t groupIdx, int32_t directionIdx) const override;

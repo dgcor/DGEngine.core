@@ -52,49 +52,49 @@ namespace SaveUtils
 	void writeBool(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, bool val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.Bool(val);
 	}
 
 	void writeInt(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, int val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.Int(val);
 	}
 
 	void writeInt64(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, int64_t val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.Int64(val);
 	}
 
 	void writeUInt(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, unsigned val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.Uint(val);
 	}
 
 	void writeUInt64(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, uint64_t val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.Uint64(val);
 	}
 
 	void writeDouble(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, double val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.Double(val);
 	}
 
 	void writeNumber32(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, const Number32& val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		if (val.isInt32() == true)
 		{
 			writer.Int(val.getInt32());
@@ -118,21 +118,21 @@ namespace SaveUtils
 	void writeKeyStringView(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 	}
 
 	void writeString(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, const std::string& val)
 	{
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (SizeType)key.size());
 		writer.String(val);
 	}
 
 	void writeStringView(PrettyWriter<StringBuffer>& writer,
 		const std::string_view key, const std::string_view val)
 	{
-		writer.Key(key.data(), key.size());
-		writer.String(val.data(), val.size());
+		writer.Key(key.data(), (SizeType)key.size());
+		writer.String(val.data(), (SizeType)val.size());
 	}
 
 	void writeString(PrettyWriter<StringBuffer>& writer,
@@ -144,6 +144,6 @@ namespace SaveUtils
 	void writeStringView(PrettyWriter<StringBuffer>& writer,
 		const std::string_view val)
 	{
-		writer.String(val.data(), val.size());
+		writer.String(val.data(), (SizeType)val.size());
 	}
 }

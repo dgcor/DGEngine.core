@@ -47,7 +47,7 @@ namespace SaveUtils
 		const std::string_view key, const T& val)
 	{
 		writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (rapidjson::SizeType)key.size());
 		writer.StartArray();
 		if constexpr (std::is_integral<NumType>::value == true)
 		{
@@ -94,7 +94,7 @@ namespace SaveUtils
 		const std::string_view key, const T& val)
 	{
 		writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
-		writer.Key(key.data(), key.size());
+		writer.Key(key.data(), (rapidjson::SizeType)key.size());
 		writer.StartArray();
 		if constexpr (std::is_integral<decltype(val.x)>::value == true)
 		{

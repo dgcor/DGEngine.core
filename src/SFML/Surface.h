@@ -12,9 +12,9 @@ class Sprite2;
 struct SpriteShaderCache;
 class UIObject;
 
-class LevelSurface
+class Surface
 {
-private:
+protected:
 	sf::RectangleShape sprite;
 	mutable sf::RenderTexture texture;
 	View2 mapView{ true };
@@ -33,6 +33,8 @@ public:
 
 	sf::FloatRect visibleRect;
 	bool visible{ true };
+
+	virtual ~Surface() = default;
 
 	Anchor getAnchor() const noexcept;
 	void setAnchor(const Anchor anchor_) noexcept;

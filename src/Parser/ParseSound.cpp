@@ -1,4 +1,5 @@
 #include "ParseSound.h"
+#include <cassert>
 #include "Game.h"
 #include "ParseAudioCommon.h"
 #include "SFML/PhysFSStream.h"
@@ -134,7 +135,7 @@ namespace Parser
 		const auto& fileElem = elem["file"sv];
 
 		bool hasFile = true;
-		size_t fileIdx = 0;
+		SizeType fileIdx = 0;
 		while (hasFile == true)
 		{
 			const Value* fileVal = nullptr;
@@ -203,7 +204,7 @@ namespace Parser
 			}
 
 			bool hasChunk = true;
-			size_t chunkIdx = 0;
+			SizeType chunkIdx = 0;
 			while (hasChunk == true)
 			{
 				sf::Music::TimeSpan chunk;
@@ -301,27 +302,35 @@ namespace Parser
 		return false;
 	}
 
-	void parseSound(Game& game, const Value& elem)
+	sf::SoundBuffer* getSoundObj(Game& game, const Value& elem)
 	{
+		if (isValidString(elem, "file") == true)
+		{
+			return parseSingleSoundObj(game, elem);
+		}
+		else if (isValidArray(elem, "file") == true)
+		{
+			return parseMultiSoundObj(game, elem);
+		}
+		return nullptr;
+	}
+
+	void parseSound(Game& game, const Value& elem,
+		const getSoundObjFuncPtr getSoundObjFunc)
+	{
+		assert(getSoundObjFunc != nullptr);
+
 		if (parseSoundFromId(game, elem) == true)
 		{
 			return;
 		}
 
-		sf::SoundBuffer* sndBuffer = nullptr;
-
-		if (isValidString(elem, "file") == true)
-		{
-			sndBuffer = parseSingleSoundObj(game, elem);
-		}
-		else if (isValidArray(elem, "file") == true)
-		{
-			sndBuffer = parseMultiSoundObj(game, elem);
-		}
+		auto sndBuffer = getSoundObjFunc(game, elem);
 		if (sndBuffer == nullptr)
 		{
 			return;
 		}
+
 		if (getBoolKey(elem, "play") == true)
 		{
 			sf::Sound sound(*sndBuffer);
@@ -336,5 +345,10 @@ namespace Parser
 
 			game.Resources().addPlayingSound(sound);
 		}
+	}
+
+	void parseSound(Game& game, const Value& elem)
+	{
+		parseSound(game, elem, getSoundObj);
 	}
 }

@@ -18,11 +18,11 @@
 /Debug Clang
 /Debug Code Analysis
 /Debug NoMovie
-/DGEngine
+/DGEngine.core
+/DGEngine.core.dir
 /Makefile
 /obj
 /portable
-/Project.dir
 /Release
 /Release NoMovie
 /Release Static

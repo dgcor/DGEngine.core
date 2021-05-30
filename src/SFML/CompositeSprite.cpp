@@ -5,9 +5,9 @@ CompositeSprite::CompositeSprite(const TextureInfo& ti)
 	setTexture(ti);
 }
 
-CompositeSprite::CompositeSprite(const std::vector<TextureInfo>& ti)
+CompositeSprite::CompositeSprite(const std::vector<TextureInfo>& ti, bool drawAfter)
 {
-	setTexture(ti);
+	setTexture(ti, drawAfter);
 }
 
 void CompositeSprite::setPosition(const sf::Vector2f& position_)
@@ -77,10 +77,11 @@ void CompositeSprite::setTexture(const TextureInfo& ti)
 	extraSprites.clear();
 }
 
-void CompositeSprite::setTexture(const std::vector<TextureInfo>& ti)
+void CompositeSprite::setTexture(const std::vector<TextureInfo>& ti, bool drawAfter)
 {
 	if (ti.empty() == false)
 	{
+		drawAfterExtraSprites = drawAfter;
 		sprite.setOffset(ti.front().offset);
 		sprite.setTexture(ti.front(), true);
 		extraSprites.resize(ti.size() - 1);
@@ -110,19 +111,22 @@ void CompositeSprite::setTexture(const TextureInfoVar& ti)
 void CompositeSprite::draw(sf::RenderTarget& target, GameShader* spriteShader) const
 {
 	SpriteShaderCache cache;
-	sprite.draw(target, spriteShader, &cache);
-	for (const auto& s : extraSprites)
-	{
-		s.draw(target, spriteShader, &cache);
-	}
+	draw(target, spriteShader, cache);
 }
 
 void CompositeSprite::draw(sf::RenderTarget& target, GameShader* spriteShader,
 	SpriteShaderCache& cache) const
 {
-	sprite.draw(target, spriteShader, &cache);
+	if (drawAfterExtraSprites == false)
+	{
+		sprite.draw(target, spriteShader, &cache);
+	}
 	for (const auto& s : extraSprites)
 	{
 		s.draw(target, spriteShader, &cache);
+	}
+	if (drawAfterExtraSprites == true)
+	{
+		sprite.draw(target, spriteShader, &cache);
 	}
 }

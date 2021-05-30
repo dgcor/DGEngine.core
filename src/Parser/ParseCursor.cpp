@@ -1,8 +1,7 @@
 #include "ParseCursor.h"
-#include "Animation.h"
+#include <cassert>
 #include <cmath>
 #include "Game.h"
-#include "ParseAnimation.h"
 #include "Utils/ParseUtils.h"
 
 namespace Parser
@@ -24,8 +23,11 @@ namespace Parser
 		}
 	}
 
-	void parseCursor(Game& game, const Value& elem)
+	void parseCursor(Game& game, const Value& elem,
+		const getAnimationObjFuncPtr getAnimationObjFunc)
 	{
+		assert(getAnimationObjFunc != nullptr);
+
 		if (elem.IsNull() == true)
 		{
 			game.Resources().addCursor(nullptr);
@@ -47,7 +49,7 @@ namespace Parser
 			game.updateMousePosition();
 		}
 
-		auto cursor = getAnimationObj(game, elem);
+		auto cursor = getAnimationObjFunc(game, elem);
 		if (cursor == nullptr)
 		{
 			return;
@@ -56,5 +58,10 @@ namespace Parser
 		cursor->setOrigin(getOrigin(elem, size.x, size.y));
 		game.Resources().addCursor(cursor);
 		game.updateMousePosition();
+	}
+
+	void parseCursor(Game& game, const Value& elem)
+	{
+		parseCursor(game, elem, getAnimationObj);
 	}
 }

@@ -7,7 +7,7 @@
 
 class RectTexturePack : public TexturePack
 {
-private:
+protected:
 	struct RectTexture
 	{
 		uint32_t index;
@@ -48,7 +48,7 @@ public:
 	const sf::Texture* getTexture() const noexcept override { return texturePack->getTexture(); }
 
 	const std::shared_ptr<Palette>& getPalette() const noexcept override { return texturePack->getPalette(); }
-	uint32_t size() const noexcept override { return rects.size(); }
+	uint32_t size() const noexcept override { return (uint32_t)rects.size(); }
 
 	uint32_t getGroupCount() const noexcept override;
 	uint32_t getDirectionCount(uint32_t groupIdx) const noexcept override;

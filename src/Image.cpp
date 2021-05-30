@@ -24,7 +24,7 @@ Image::Image(const TextureInfo& ti) : sprite(ti)
 	sprite.setOutlineEnabled(true);
 }
 
-Image::Image(const std::vector<TextureInfo>& ti) : sprite(ti)
+Image::Image(const std::vector<TextureInfo>& ti, bool drawAfter) : sprite(ti, drawAfter)
 {
 	sprite.setOutlineEnabled(true);
 }
@@ -45,9 +45,9 @@ void Image::setTexture(const TextureInfo& ti)
 	sprite.setTexture(ti);
 }
 
-void Image::setTexture(const std::vector<TextureInfo>& ti)
+void Image::setTexture(const std::vector<TextureInfo>& ti, bool drawAfter)
 {
-	sprite.setTexture(ti);
+	sprite.setTexture(ti, drawAfter);
 }
 
 void Image::setTexture(const TextureInfoVar& ti)

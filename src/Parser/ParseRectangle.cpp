@@ -1,4 +1,5 @@
 #include "ParseRectangle.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include "Panel.h"
@@ -10,18 +11,8 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseRectangle(Game& game, const Value& elem)
+	std::shared_ptr<Rectangle> getRectangleObj(Game& game, const Value& elem)
 	{
-		if (isValidString(elem, "id") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		auto rectangle = std::make_shared<Rectangle>(getVector2fKey<sf::Vector2f>(elem, "size"));
 
 		if (isValidString(elem, "texture"))
@@ -56,6 +47,30 @@ namespace Parser
 		rectangle->setOutlineColor(getColorKey(elem, "outlineColor", sf::Color::White));
 		rectangle->setOutlineThickness((float)getUIntKey(elem, "outlineThickness"));
 
+		return rectangle;
+	}
+
+	void parseRectangle(Game& game, const Value& elem,
+		const getRectangleObjFuncPtr getRectangleObjFunc)
+	{
+		assert(getRectangleObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto rectangle = getRectangleObjFunc(game, elem);
+		if (rectangle == nullptr)
+		{
+			return;
+		}
+
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
 		{
@@ -70,5 +85,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, rectangle, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseRectangle(Game& game, const Value& elem)
+	{
+		parseRectangle(game, elem, getRectangleObj);
 	}
 }

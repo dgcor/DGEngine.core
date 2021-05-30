@@ -7,14 +7,13 @@ CachedImagePack::CachedImagePack(const ImageContainer* imgContainer_,
 {
 	cache.resize(imgContainer_->size());
 
-	if (isIndexed == false &&
-		palette == nullptr)
+	if (isIndexed == false && palette == nullptr)
 	{
 		isIndexed = true;
 	}
 }
 
-sf::Image& CachedImagePack::operator[] (size_t index)
+sf::Image& CachedImagePack::operator[] (uint32_t index)
 {
 	assert(index < imgContainer->size());
 	if (cache[index].has_value() == false)

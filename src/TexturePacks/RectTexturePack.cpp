@@ -46,7 +46,7 @@ uint32_t RectTexturePack::getGroupCount() const noexcept
 {
 	if (groups.size() > 0)
 	{
-		return groups.size();
+		return (uint32_t)groups.size();
 	}
 	return texturePack->getGroupCount();
 }

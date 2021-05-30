@@ -1,5 +1,6 @@
 #include "ParseMenu.h"
 #include "BitmapText.h"
+#include <cassert>
 #include "FileUtils.h"
 #include "Game.h"
 #include "GameUtils.h"
@@ -15,11 +16,10 @@
 
 namespace Parser
 {
-	typedef std::tuple<uint16_t, std::string, Variable> FilterObject;
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseFilterObj(const Value& elem, std::vector<FilterObject>& list)
+	void parseMenuFilterObj(const Value& elem, std::vector<MenuFilterObject>& list)
 	{
 		if (elem.HasMember("value"sv) == false)
 		{
@@ -47,12 +47,12 @@ namespace Parser
 		}
 	}
 
-	std::vector<FilterObject> parseFilterList(const Value& elem)
+	std::vector<MenuFilterObject> parseMenuFilterList(const Value& elem)
 	{
-		std::vector<FilterObject> list;
+		std::vector<MenuFilterObject> list;
 		if (elem.IsObject() == true)
 		{
-			parseFilterObj(elem, list);
+			parseMenuFilterObj(elem, list);
 		}
 		else if (elem.IsArray() == true)
 		{
@@ -60,7 +60,7 @@ namespace Parser
 			{
 				if (val.IsObject() == true)
 				{
-					parseFilterObj(val, list);
+					parseMenuFilterObj(val, list);
 				}
 			}
 		}
@@ -76,7 +76,7 @@ namespace Parser
 		}
 	}
 
-	bool compareVariables(uint16_t conditionHash16,
+	bool compareMenuFilterVariables(uint16_t conditionHash16,
 		const Variable& var1, const Variable& var2) noexcept
 	{
 		switch (conditionHash16)
@@ -97,13 +97,13 @@ namespace Parser
 		}
 	}
 
-	bool getFilterResult(const std::vector<FilterObject>& filterList,
+	bool getMenuFilterResult(const std::vector<MenuFilterObject>& filterList,
 		const Variable& varToCheck, bool includedOrExcluded) noexcept
 	{
 		bool skip = includedOrExcluded;
 		for (const auto& filterObj : filterList)
 		{
-			if (compareVariables(std::get<0>(filterObj),
+			if (compareMenuFilterVariables(std::get<0>(filterObj),
 				varToCheck,
 				std::get<2>(filterObj)) == true)
 			{
@@ -114,7 +114,7 @@ namespace Parser
 		return skip;
 	}
 
-	bool getFilterResult(const std::vector<FilterObject>& filterList,
+	bool getMenuFilterResult(const std::vector<MenuFilterObject>& filterList,
 		const Queryable& queryable, bool includedOrExcluded)
 	{
 		bool skip = includedOrExcluded;
@@ -123,7 +123,7 @@ namespace Parser
 			Variable varToCheck;
 			if (queryable.getProperty(std::get<1>(filterObj), varToCheck) == true)
 			{
-				if (compareVariables(std::get<0>(filterObj),
+				if (compareMenuFilterVariables(std::get<0>(filterObj),
 					varToCheck,
 					std::get<2>(filterObj)) == true)
 				{
@@ -135,18 +135,9 @@ namespace Parser
 		return skip;
 	}
 
-	void parseMenu(Game& game, const Value& elem)
+	std::shared_ptr<Menu> getMenuObj(Game& game, const Value& elem,
+		const std::string_view resource)
 	{
-		if (isValidString(elem, "id") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		auto menu = std::make_shared<Menu>();
 
 		auto anchor = getAnchorKey(elem, "anchor");
@@ -159,7 +150,6 @@ namespace Parser
 		auto hasFocus = getBoolKey(elem, "focus");
 		auto focusOnClick = getBoolKey(elem, "focusOnClick", true);
 		auto clickUp = getBoolKey(elem, "clickUp");
-		auto resource = getStringViewKey(elem, "resource");
 
 		sf::SoundBuffer* sound{ nullptr };
 		if (isValidString(elem, "sound"))
@@ -175,7 +165,7 @@ namespace Parser
 		auto font = game.Resources().getFont(getStringViewKey(elem, "font"));
 		if (holdsNullFont(font) == true)
 		{
-			return;
+			return nullptr;
 		}
 
 		auto relativePos = getBoolKey(elem, "relativeCoords", true);
@@ -195,17 +185,17 @@ namespace Parser
 		{
 			if (isValidString(val, "load") == true)
 			{
-				std::vector<FilterObject> filterList;
+				std::vector<MenuFilterObject> filterList;
 				bool include = true;
 
 				if (val.HasMember("exclude"sv) == true)
 				{
-					filterList = parseFilterList(val["exclude"sv]);
+					filterList = parseMenuFilterList(val["exclude"sv]);
 					include = false;
 				}
 				else if (val.HasMember("include"sv) == true)
 				{
-					filterList = parseFilterList(val["include"sv]);
+					filterList = parseMenuFilterList(val["include"sv]);
 				}
 
 				MemoryPoolAllocator<CrtAllocator> allocator;
@@ -223,7 +213,7 @@ namespace Parser
 							continue;
 						}
 						if (filterList.empty() == false &&
-							getFilterResult(filterList, *queryable, include) == true)
+							getMenuFilterResult(filterList, *queryable, include) == true)
 						{
 							continue;
 						}
@@ -232,7 +222,7 @@ namespace Parser
 					{
 						const auto& var = std::get<Variable>(menuItem);
 						if (filterList.empty() == false &&
-							getFilterResult(filterList, var, include) == true)
+							getMenuFilterResult(filterList, var, include) == true)
 						{
 							continue;
 						}
@@ -245,13 +235,13 @@ namespace Parser
 						auto queryable = std::get<const Queryable*>(menuItem);
 						JsonUtils::replaceValueWithQueryable(valCopy, allocator, *queryable,
 							[i, menuIdx, &allocator](Value& valFunc)
-						{
-							JsonUtils::replaceStringWithVariable(
-								valFunc, allocator, "!listIdx!", Variable((int64_t)i), true);
+							{
+								JsonUtils::replaceStringWithVariable(
+									valFunc, allocator, "!listIdx!", Variable((int64_t)i), true);
 
-							JsonUtils::replaceStringWithVariable(
-								valFunc, allocator, "!menuIdx!", Variable((int64_t)menuIdx), true);
-						});
+								JsonUtils::replaceStringWithVariable(
+									valFunc, allocator, "!menuIdx!", Variable((int64_t)menuIdx), true);
+							});
 					}
 					else
 					{
@@ -324,6 +314,31 @@ namespace Parser
 		menu->updateVisibleItems();
 		menu->calculatePositions();
 
+		return menu;
+	}
+
+	void parseMenu(Game& game, const Value& elem,
+		const getMenuObjFuncPtr getMenuObjFunc)
+	{
+		assert(getMenuObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+		auto resource = getStringViewKey(elem, "resource");
+
+		auto menu = getMenuObjFunc(game, elem, resource);
+		if (menu == nullptr)
+		{
+			return;
+		}
+
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
 		{
@@ -338,5 +353,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, menu, manageObjDrawing, resource
 		);
+	}
+
+	void parseMenu(Game& game, const rapidjson::Value& elem)
+	{
+		parseMenu(game, elem, getMenuObj);
 	}
 }

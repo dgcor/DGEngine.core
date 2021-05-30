@@ -1,4 +1,5 @@
 #include "ParseAudio.h"
+#include <cassert>
 #include "Game.h"
 #include "ParseAudioCommon.h"
 #include "SFML/MusicLoops.h"
@@ -23,7 +24,7 @@ namespace Parser
 	}
 
 	bool openMusicFromFile(Game& game, std::shared_ptr<sf::Music2> music,
-		sf::PhysFSStream& stream, const AudioSource audioSource,
+		sf::InputStream& stream, const AudioSource audioSource,
 		const std::string& id, const std::string_view resource)
 	{
 		if (music->openFromStream(stream) == true &&
@@ -38,7 +39,7 @@ namespace Parser
 		return false;
 	}
 
-	sf::Music2* parseAudioFileObjHelper(Game& game, const Value& elem,
+	sf::Music2* parseAudioObjFromFile(Game& game, const Value& elem,
 		const std::string& id, const std::string& file)
 	{
 		bool hasLoopNames = elem.HasMember("loopNames"sv);
@@ -97,6 +98,77 @@ namespace Parser
 		return nullptr;
 	}
 
+	sf::Music2* parseAudioObjFromSource(Game& game,
+		const Value& elem, const std::string& id)
+	{
+		auto source = game.Resources().getAudioSource(elem["sourceId"sv].GetStringView());
+
+		if (std::holds_alternative<std::shared_ptr<sf::SoundBuffer>>(source) == true)
+		{
+			auto sndBuffer = std::get<std::shared_ptr<sf::SoundBuffer>>(source).get();
+
+			if (sndBuffer == nullptr)
+			{
+				return nullptr;
+			}
+
+			std::shared_ptr<sf::Music2> music;
+
+			if (elem.HasMember("loopPoints"sv) == true)
+			{
+				music = std::make_shared<sf::MusicLoops>();
+
+				parseAudioLoopPointsVal(
+					elem,
+					"loopPoints",
+					(*(sf::MusicLoops*)music.get()));
+			}
+			else
+			{
+				music = std::make_shared<sf::Music2>();
+			}
+			auto resource = getStringViewKey(elem, "resource");
+			if (openMusicFromBuffer(game, music, *sndBuffer, id, resource) == true)
+			{
+				return music.get();
+			}
+		}
+		else if (std::holds_alternative<std::shared_ptr<SoundBufferLoops>>(source) == true)
+		{
+			auto sndBuffer = std::get<std::shared_ptr<SoundBufferLoops>>(source).get();
+
+			if (sndBuffer == nullptr)
+			{
+				return nullptr;
+			}
+
+			auto music = std::make_shared<sf::MusicLoops>();
+			auto music2 = std::dynamic_pointer_cast<sf::Music2>(music);
+			auto resource = getStringViewKey(elem, "resource");
+
+			if (openMusicFromBuffer(game, music2,
+				sndBuffer->soundBuffer, id, resource) == true)
+			{
+				if (elem.HasMember("loopPoints"sv) == true)
+				{
+					parseAudioLoopPointsVal(
+						elem,
+						"loopPoints",
+						*music);
+				}
+				else if (isValidString(elem, "playText") == true)
+				{
+					updateAudioLoopString(
+						getStringViewVal(elem["playText"sv]),
+						sndBuffer->loops,
+						*music);
+				}
+				return music.get();
+			}
+		}
+		return nullptr;
+	}
+
 	sf::Music2* parseAudioObj(Game& game, const Value& elem)
 	{
 		std::string id;
@@ -110,71 +182,7 @@ namespace Parser
 		if (isValidString(elem, "sourceId") == true &&
 			validId == true)
 		{
-			auto source = game.Resources().getAudioSource(elem["sourceId"sv].GetStringView());
-
-			if (std::holds_alternative<std::shared_ptr<sf::SoundBuffer>>(source) == true)
-			{
-				auto sndBuffer = std::get<std::shared_ptr<sf::SoundBuffer>>(source).get();
-
-				if (sndBuffer == nullptr)
-				{
-					return nullptr;
-				}
-
-				std::shared_ptr<sf::Music2> music;
-
-				if (elem.HasMember("loopPoints"sv) == true)
-				{
-					music = std::make_shared<sf::MusicLoops>();
-
-					parseAudioLoopPointsVal(
-						elem,
-						"loopPoints",
-						(*(sf::MusicLoops*)music.get()));
-				}
-				else
-				{
-					music = std::make_shared<sf::Music2>();
-				}
-				auto resource = getStringViewKey(elem, "resource");
-				if (openMusicFromBuffer(game, music, *sndBuffer, id, resource) == true)
-				{
-					return music.get();
-				}
-			}
-			else if (std::holds_alternative<std::shared_ptr<SoundBufferLoops>>(source) == true)
-			{
-				auto sndBuffer = std::get<std::shared_ptr<SoundBufferLoops>>(source).get();
-
-				if (sndBuffer == nullptr)
-				{
-					return nullptr;
-				}
-
-				auto music = std::make_shared<sf::MusicLoops>();
-				auto music2 = std::dynamic_pointer_cast<sf::Music2>(music);
-				auto resource = getStringViewKey(elem, "resource");
-
-				if (openMusicFromBuffer(game, music2,
-					sndBuffer->soundBuffer, id, resource) == true)
-				{
-					if (elem.HasMember("loopPoints"sv) == true)
-					{
-						parseAudioLoopPointsVal(
-							elem,
-							"loopPoints",
-							*music);
-					}
-					else if (isValidString(elem, "playText") == true)
-					{
-						updateAudioLoopString(
-							getStringViewVal(elem["playText"sv]),
-							sndBuffer->loops,
-							*music);
-					}
-					return music.get();
-				}
-			}
+			return parseAudioObjFromSource(game, elem, id);
 		}
 		else if (isValidString(elem, "file") == true)
 		{
@@ -191,7 +199,7 @@ namespace Parser
 					return nullptr;
 				}
 			}
-			return parseAudioFileObjHelper(game, elem, id, file);
+			return parseAudioObjFromFile(game, elem, id, file);
 		}
 		return nullptr;
 	}
@@ -218,14 +226,17 @@ namespace Parser
 		return false;
 	}
 
-	void parseAudio(Game& game, const Value& elem)
+	void parseAudio(Game& game, const Value& elem,
+		const parseAudioObjFuncPtr parseAudioObjFunc)
 	{
+		assert(parseAudioObjFunc != nullptr);
+
 		if (parseAudioFromId(game, elem) == true)
 		{
 			return;
 		}
 
-		auto music = parseAudioObj(game, elem);
+		auto music = parseAudioObjFunc(game, elem);
 		if (music == nullptr)
 		{
 			return;
@@ -251,5 +262,10 @@ namespace Parser
 		{
 			music->play();
 		}
+	}
+
+	void parseAudio(Game& game, const Value& elem)
+	{
+		parseAudio(game, elem, parseAudioObj);
 	}
 }

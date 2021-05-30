@@ -3,6 +3,7 @@
 #include "ImageContainers/ImageContainer.h"
 #include <memory>
 #include "Palette.h"
+#include <SFML/System/InputStream.hpp>
 #include <vector>
 
 namespace ImageUtils
@@ -17,7 +18,7 @@ namespace ImageUtils
 		const std::shared_ptr<Palette>& pal);
 
 	sf::Image loadImageFrame(const ImageContainer& imgContainer,
-		const PaletteArray* pal, size_t frameIdx);
+		const PaletteArray* pal, uint32_t frameIdx);
 
 	sf::Image loadBitmapFontImage(const ImageContainer& imgContainer,
 		const std::string_view fileNameCharMap, const std::shared_ptr<Palette>& pal);

@@ -6,7 +6,7 @@
 
 class BitmapFontTexturePack : public TexturePack
 {
-private:
+protected:
 	std::shared_ptr<sf::Texture> texture;
 	std::shared_ptr<Palette> palette;
 	std::vector<sf::IntRect> charRects;
@@ -31,5 +31,5 @@ public:
 	bool get(uint32_t index, TextureInfo& ti) const override;
 
 	const std::shared_ptr<Palette>& getPalette() const noexcept override { return palette; }
-	uint32_t size() const noexcept override { return charRects.size(); }
+	uint32_t size() const noexcept override { return (uint32_t)charRects.size(); }
 };

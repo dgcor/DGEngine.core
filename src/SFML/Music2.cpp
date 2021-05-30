@@ -360,7 +360,7 @@ namespace sf
 		m_loopSpan.length = m_buffer.sampleCount;
 
 		// Initialize the stream
-		SoundStream::initialize(m_buffer.channelCount, m_buffer.sampleRate);
+		SoundStream::initialize((unsigned)m_buffer.channelCount, (unsigned)m_buffer.sampleRate);
 	}
 
 	Uint64 Music2::timeToSamples(Time position,

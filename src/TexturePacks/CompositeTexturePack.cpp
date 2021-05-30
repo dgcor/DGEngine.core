@@ -68,8 +68,8 @@ void CompositeTexturePack::setLayersOrders(const std::vector<int8_t>& groupLayer
 		return;
 	}
 
-	auto layersOrdersStartIdx = layersOrders.empty() == true ? 0 : layersOrders.size() - 1;
-	auto layersOrdersStopIdx = layersOrdersStartIdx + groupLayersOrders.size() - 1;
+	auto layersOrdersStartIdx = layersOrders.empty() == true ? 0 : (uint32_t)layersOrders.size() - 1;
+	auto layersOrdersStopIdx = layersOrdersStartIdx + (uint32_t)groupLayersOrders.size() - 1;
 
 	layersOrders.insert(layersOrders.end(), groupLayersOrders.begin(), groupLayersOrders.end());
 
@@ -83,7 +83,7 @@ uint32_t CompositeTexturePack::getLayerCount(uint32_t groupIdx) const noexcept
 {
 	if (compositeTextureGroups.size() <= 1)
 	{
-		return texturePacks.size();
+		return (uint32_t)texturePacks.size();
 	}
 	else if (hasMultipleGroupsPerTexturePack == false)
 	{

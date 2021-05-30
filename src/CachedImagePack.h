@@ -19,11 +19,11 @@ public:
 	CachedImagePack(const ImageContainer* imgContainer_,
 		const std::shared_ptr<Palette>& palette_, bool isIndexed_ = false);
 
-	sf::Image& get(size_t index) { return (*this)[index]; }
+	sf::Image& get(uint32_t index) { return (*this)[index]; }
 
-	sf::Image& operator[] (size_t index);
+	sf::Image& operator[] (uint32_t index);
 
 	const std::shared_ptr<Palette>& getPalette() const noexcept { return palette; }
 	bool IsIndexed() const noexcept { return isIndexed; }
-	size_t size() const noexcept { return imgContainer->size(); }
+	uint32_t size() const noexcept { return imgContainer->size(); }
 };

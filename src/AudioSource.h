@@ -24,7 +24,7 @@ struct SoundFileLoops
 
 typedef std::variant<
 	std::shared_ptr<sf::SoundBuffer>,
-	std::shared_ptr<sf::PhysFSStream>,
+	std::shared_ptr<sf::InputStream>,
 	std::shared_ptr<SoundBufferLoops>,
 	std::shared_ptr<SoundFileLoops>>
 	AudioSource;

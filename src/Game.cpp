@@ -2,8 +2,7 @@
 #include "Button.h"
 #include "FileUtils.h"
 #include "Formula.h"
-#include "Game/Level.h"
-#include "GameConstants.h"
+#include "Hooks.h"
 #include "Image.h"
 #include "Json/JsonUtils.h"
 #include <mutex>
@@ -13,6 +12,15 @@
 #include "SFML/Wave2.h"
 #include "Utils/ReverseIterable.h"
 #include "Utils/Utils.h"
+
+uint32_t Game::DefaultSizeX{ 640 };
+uint32_t Game::DefaultSizeY{ 480 };
+
+uint32_t Game::MinSizeX{ 640 };
+uint32_t Game::MinSizeY{ 480 };
+
+uint32_t Game::RefSizeX{ 640 };
+uint32_t Game::RefSizeY{ 480 };
 
 Game::Game()
 {
@@ -33,10 +41,10 @@ void Game::reset()
 {
 	gameSprite = {};
 
-	refSize = { DGENGINE_REF_SIZE_X, DGENGINE_REF_SIZE_Y };
-	minSize = { DGENGINE_MIN_SIZE_X, DGENGINE_MIN_SIZE_Y };
-	size = { DGENGINE_DEFAULT_SIZE_X, DGENGINE_DEFAULT_SIZE_Y };
-	drawRegionSize = { DGENGINE_DEFAULT_SIZE_X, DGENGINE_DEFAULT_SIZE_Y };
+	refSize = { RefSizeX, RefSizeY };
+	minSize = { MinSizeX, MinSizeY };
+	size = { DefaultSizeX, DefaultSizeY };
+	drawRegionSize = { DefaultSizeX, DefaultSizeY };
 	oldDrawRegionSize = {};
 	maxHeight = { 0 };
 	framerate = { 0 };
@@ -81,7 +89,14 @@ void Game::reset()
 	version = {};
 
 	resourceManager = {};
-	resourceManager.Shaders().init();
+	if (Hooks::InitializeShaderManager != nullptr)
+	{
+		Hooks::InitializeShaderManager(resourceManager.Shaders());
+	}
+	else
+	{
+		ShaderManager::init(resourceManager.Shaders());
+	}
 	resourceManager.Shaders().init(shaders);
 
 	variables = {};
@@ -141,7 +156,7 @@ void Game::WindowSize(sf::Vector2u size_)
 
 void Game::RefSize(const sf::Vector2u& size_)
 {
-	if (size_.x >= DGENGINE_REF_SIZE_X && size_.y >= DGENGINE_REF_SIZE_Y)
+	if (size_.x >= RefSizeX && size_.y >= RefSizeY)
 	{
 		refSize = size_;
 	}
@@ -150,7 +165,7 @@ void Game::RefSize(const sf::Vector2u& size_)
 void Game::MinSize(const sf::Vector2u& size_)
 {
 	bool needsUpdate = false;
-	if (size_.x >= DGENGINE_MIN_SIZE_X && size_.y >= DGENGINE_MIN_SIZE_Y)
+	if (size_.x >= MinSizeX && size_.y >= MinSizeY)
 	{
 		minSize = size_;
 		if (window.isOpen() == true)
@@ -1109,67 +1124,79 @@ bool Game::getProperty(const std::string_view prop, Variable& var) const
 		return getVariableNoToken(prop.substr(1), var);
 	}
 	auto props = Utils::splitStringIn2(prop, '.');
-	switch (str2int16(props.first))
+	return getProperty(props.first, props.second, var);
+}
+
+bool Game::getProperty(const std::string_view prop1, const std::string_view prop2, Variable& var) const
+{
+	switch (str2int16(prop1))
 	{
 	case str2int16("$"):
 	case str2int16("eval"):
-		var = Variable((int64_t)Formula::evalString(props.second, *this));
+		var = Variable((int64_t)Formula::evalString(prop2, *this));
 		return true;
 	case str2int16("evalMin"):
-		var = Variable((int64_t)Formula::evalMinString(props.second, *this));
+		var = Variable((int64_t)Formula::evalMinString(prop2, *this));
 		return true;
 	case str2int16("evalMax"):
-		var = Variable((int64_t)Formula::evalMaxString(props.second, *this));
+		var = Variable((int64_t)Formula::evalMaxString(prop2, *this));
 		return true;
 	case str2int16("$f"):
 	case str2int16("evalf"):
-		var = Variable(Formula::evalString(props.second, *this));
+		var = Variable(Formula::evalString(prop2, *this));
 		return true;
 	case str2int16("evalMinf"):
-		var = Variable(Formula::evalMinString(props.second, *this));
+		var = Variable(Formula::evalMinString(prop2, *this));
 		return true;
 	case str2int16("evalMaxf"):
-		var = Variable(Formula::evalMaxString(props.second, *this));
+		var = Variable(Formula::evalMaxString(prop2, *this));
 		return true;
 	case str2int16("game"):
+	{
+		if (prop2.size() > 1)
+		{
+			return getGameProperty(prop2, var);
+		}
 		break;
+	}
 	default:
 	{
 		const UIObject* uiObject = nullptr;
-		if (props.first == "currentLevel")
+		if (prop1 == "currentLevel")
 		{
-			uiObject = resourceManager.getCurrentLevel();
+			uiObject = resourceManager.getCurrentLevel<UIObject>();
 		}
-		else if (props.first == "focus")
+		else if (prop1 == "focus")
 		{
 			uiObject = resourceManager.getFocused();
 		}
 		else
 		{
-			uiObject = resourceManager.getDrawable(props.first);
+			uiObject = resourceManager.getDrawable(prop1);
 		}
 		if (uiObject != nullptr)
 		{
-			return uiObject->getProperty(props.second, var);
+			return uiObject->getProperty(prop2, var);
 		}
-		return false;
+		break;
 	}
 	}
-	if (props.second.size() <= 1)
-	{
-		return false;
-	}
-	return getGameProperty(props.second, var);
+	return false;
 }
 
 bool Game::getGameProperty(const std::string_view prop, Variable& var) const
 {
 	auto props = Utils::splitStringIn2(prop, '.');
-	switch (str2int16(props.first))
+	return getGameProperty(props.first, props.second, var);
+}
+
+bool Game::getGameProperty(const std::string_view prop1, const std::string_view prop2, Variable& var) const
+{
+	switch (str2int16(prop1))
 	{
 	case str2int16("cursor"):
 	{
-		if (props.second == "x")
+		if (prop2 == "x")
 		{
 			var = Variable((int64_t)mousePositioni.x);
 		}
@@ -1186,43 +1213,43 @@ bool Game::getGameProperty(const std::string_view prop, Variable& var) const
 		var = Variable((int64_t)gamma);
 		break;
 	case str2int16("hasAudio"):
-		var = Variable(resourceManager.hasAudioSource(props.second));
+		var = Variable(resourceManager.hasAudioSource(prop2));
 		break;
 	case str2int16("hasDrawable"):
-		var = Variable(resourceManager.hasDrawable(props.second));
+		var = Variable(resourceManager.hasDrawable(prop2));
 		break;
 	case str2int16("hasEvent"):
-		var = Variable(eventManager.exists(props.second));
+		var = Variable(eventManager.exists(prop2));
 		break;
 	case str2int16("hasFont"):
-		var = Variable(resourceManager.hasFont(props.second));
+		var = Variable(resourceManager.hasFont(prop2));
 		break;
 	case str2int16("hasGameShader"):
 		var = Variable(shaders.hasGameShader());
 		break;
 	case str2int16("hasImageContainer"):
-		var = Variable(resourceManager.hasImageContainer(props.second));
+		var = Variable(resourceManager.hasImageContainer(prop2));
 		break;
 	case str2int16("hasPalette"):
-		var = Variable(resourceManager.hasPalette(props.second));
+		var = Variable(resourceManager.hasPalette(prop2));
 		break;
 	case str2int16("hasResource"):
-		var = Variable(resourceManager.resourceExists(props.second));
+		var = Variable(resourceManager.resourceExists(prop2));
 		break;
 	case str2int16("hasShader"):
-		var = Variable(resourceManager.Shaders().has(props.second));
+		var = Variable(resourceManager.Shaders().has(prop2));
 		break;
 	case str2int16("hasSong"):
-		var = Variable(resourceManager.hasSong(props.second));
+		var = Variable(resourceManager.hasSong(prop2));
 		break;
 	case str2int16("hasSpriteShader"):
 		var = Variable(shaders.hasSpriteShader());
 		break;
 	case str2int16("hasTexture"):
-		var = Variable(resourceManager.hasTexture(props.second));
+		var = Variable(resourceManager.hasTexture(prop2));
 		break;
 	case str2int16("hasTexturePack"):
-		var = Variable(resourceManager.hasTexturePack(props.second));
+		var = Variable(resourceManager.hasTexturePack(prop2));
 		break;
 	case str2int16("keepAR"):
 		var = Variable(keepAR);
@@ -1232,7 +1259,7 @@ bool Game::getGameProperty(const std::string_view prop, Variable& var) const
 		break;
 	case str2int16("minSize"):
 	{
-		if (props.second == "x")
+		if (prop2 == "x")
 		{
 			var = Variable((int64_t)minSize.x);
 		}
@@ -1244,7 +1271,7 @@ bool Game::getGameProperty(const std::string_view prop, Variable& var) const
 	}
 	case str2int16("openGL"):
 	{
-		switch (str2int16(props.second))
+		switch (str2int16(prop2))
 		{
 		case str2int16("antialiasingLevel"):
 			var = Variable((int64_t)getOpenGLAntialiasingLevel());
@@ -1286,7 +1313,7 @@ bool Game::getGameProperty(const std::string_view prop, Variable& var) const
 		break;
 	case str2int16("refSize"):
 	{
-		if (props.second == "x")
+		if (prop2 == "x")
 		{
 			var = Variable((int64_t)refSize.x);
 		}
@@ -1301,7 +1328,7 @@ bool Game::getGameProperty(const std::string_view prop, Variable& var) const
 		break;
 	case str2int16("size"):
 	{
-		if (props.second == "x")
+		if (prop2 == "x")
 		{
 			var = Variable((int64_t)size.x);
 		}
@@ -1427,28 +1454,31 @@ const Queryable* Game::getQueryable(const std::string_view prop) const
 		return this;
 	}
 	auto props = Utils::splitStringIn2(prop, '.');
-	if (props.first.empty() == true ||
-		props.first == "game")
+	return getQueryable(props.first, props.second);
+}
+
+const Queryable* Game::getQueryable(const std::string_view prop1, const std::string_view prop2) const
+{
+	if (prop1.empty() == true || prop1 == "game")
 	{
 		return this;
 	}
 	const Queryable* queryable = nullptr;
-	if (props.first == "currentLevel")
+	if (prop1 == "currentLevel")
 	{
-		queryable = resourceManager.getCurrentLevel();
+		queryable = resourceManager.getCurrentLevel<Queryable>();
 	}
-	else if (props.first == "focus")
+	else if (prop1 == "focus")
 	{
 		queryable = resourceManager.getFocused();
 	}
 	else
 	{
-		queryable = resourceManager.getDrawable(props.first);
+		queryable = resourceManager.getDrawable(prop1);
 	}
-	if (queryable != nullptr &&
-		props.second.empty() == false)
+	if (queryable != nullptr && prop2.empty() == false)
 	{
-		return queryable->getQueryable(props.second);
+		return queryable->getQueryable(prop2);
 	}
 	return queryable;
 }
@@ -1456,59 +1486,50 @@ const Queryable* Game::getQueryable(const std::string_view prop) const
 std::vector<std::variant<const Queryable*, Variable>> Game::getQueryableList(
 	const std::string_view prop) const
 {
-	std::vector<std::variant<const Queryable*, Variable>> queriableList;
-
-	if (prop.empty() == true)
+	std::vector<std::variant<const Queryable*, Variable>> queryableList;
+	if (prop.empty() == false)
 	{
-		return queriableList;
+		auto props = Utils::splitStringIn2(prop, '.');
+		getQueryableList(props.first, props.second, queryableList);
 	}
-	auto props = Utils::splitStringIn2(prop, '.');
-	if (props.first.empty() == false)
+	return queryableList;
+}
+
+bool Game::getQueryableList(const std::string_view prop1, const std::string_view prop2,
+	std::vector<std::variant<const Queryable*, Variable>>& queryableList) const
+{
+	if (prop1.empty() == false)
 	{
-		if (props.first == "game")
+		if (prop1 == "game")
 		{
-			auto props2 = Utils::splitStringIn2(props.second, '.');
-			if (props2.first == "saveDirs")
+			auto props = Utils::splitStringIn2(prop2, '.');
+			if (props.first == "saveDirs")
 			{
 				for (const auto& dir : FileUtils::getSaveDirList())
 				{
-					queriableList.push_back({ dir });
+					queryableList.push_back({ dir });
 				}
+				return true;
 			}
-			else if (props2.first == "dirs")
+			else if (props.first == "dirs")
 			{
-				for (const auto& dir : FileUtils::geDirList(props2.second, ""))
+				for (const auto& dir : FileUtils::geDirList(props.second, ""))
 				{
-					queriableList.push_back({ dir });
+					queryableList.push_back({ dir });
 				}
+				return true;
 			}
-			else if (props2.first == "files")
+			else if (props.first == "files")
 			{
-				for (const auto& dir : FileUtils::getFileList(props2.second, "", false))
+				for (const auto& dir : FileUtils::getFileList(props.second, "", false))
 				{
-					queriableList.push_back({ dir });
+					queryableList.push_back({ dir });
 				}
-			}
-		}
-		else
-		{
-			Level* level = nullptr;
-			if (props.first == "currentLevel")
-			{
-				level = resourceManager.getCurrentLevel();
-			}
-			else
-			{
-				level = resourceManager.getDrawable<Level>(props.first);
-			}
-			if (level != nullptr &&
-				props.second.empty() == false)
-			{
-				return level->getQueryableList(props.second);
+				return true;
 			}
 		}
 	}
-	return queriableList;
+	return false;
 }
 
 void Game::setShader(const std::string_view id, GameShader* shader) noexcept

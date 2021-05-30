@@ -1,4 +1,5 @@
 #include "ParseMovie.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include <iostream>
@@ -13,29 +14,9 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseMovie(Game& game, const Value& elem)
+	std::shared_ptr<Movie> getMovieObj(Game& game,
+		const Value& elem, const std::string_view file)
 	{
-		if (isValidString(elem, "file") == false)
-		{
-			return;
-		}
-
-		auto file = getStringViewVal(elem["file"sv]);
-		std::string id;
-
-		if (isValidString(elem, "id") == true)
-		{
-			id = elem["id"sv].GetStringView();
-		}
-		else if (getIdFromFile(file, id) == false)
-		{
-			return;
-		}
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		std::shared_ptr<Action> action;
 		if (elem.HasMember("onComplete"sv))
 		{
@@ -48,7 +29,7 @@ namespace Parser
 			{
 				game.Events().addBack(action);
 			}
-			return;
+			return nullptr;
 		}
 		else
 		{
@@ -80,6 +61,41 @@ namespace Parser
 
 		movie->Visible(getBoolKey(elem, "visible", true));
 
+		return movie;
+	}
+
+	void parseMovie(Game& game, const Value& elem,
+		const getMovieObjFuncPtr getMovieObjFunc)
+	{
+		assert(getMovieObjFunc != nullptr);
+
+		if (isValidString(elem, "file") == false)
+		{
+			return;
+		}
+
+		auto file = getStringViewVal(elem["file"sv]);
+		std::string id;
+
+		if (isValidString(elem, "id") == true)
+		{
+			id = elem["id"sv].GetStringView();
+		}
+		else if (getIdFromFile(file, id) == false)
+		{
+			return;
+		}
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto movie = getMovieObjFunc(game, elem, file);
+		if (movie == nullptr)
+		{
+			return;
+		}
+
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
 		{
@@ -96,5 +112,10 @@ namespace Parser
 		);
 
 		movie->play();
+	}
+
+	void parseMovie(Game& game, const Value& elem)
+	{
+		parseMovie(game, elem, getMovieObj);
 	}
 }

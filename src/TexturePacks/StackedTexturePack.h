@@ -5,7 +5,7 @@
 
 class StackedTexturePack : public TexturePack
 {
-private:
+protected:
 	std::vector<std::shared_ptr<TexturePack>> texturePacks;
 	std::shared_ptr<Palette> palette;
 

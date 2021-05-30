@@ -1,4 +1,5 @@
 #include "ParseTexturePack.h"
+#include <cassert>
 #include "FileUtils.h"
 #include "Game.h"
 #include <SFML/System/Utf.hpp>
@@ -43,7 +44,7 @@ namespace Parser
 		return TexturePackType::Generic;
 	}
 
-	void parseDirectionVector(const Value& elem, uint32_t& directions,
+	void parseTexturePackDirectionVector(const Value& elem, uint32_t& directions,
 		std::vector<std::pair<uint32_t, uint32_t>>& directionsVec)
 	{
 		if (isValidArray(elem, "directions") == true)
@@ -166,7 +167,7 @@ namespace Parser
 		}
 		t.offset = getVector2fKey<sf::Vector2f>(elem, "offset");
 		t.startIndex = getUIntKey(elem, "startIndex");
-		parseDirectionVector(elem, t.directions, t.directionsVec);
+		parseTexturePackDirectionVector(elem, t.directions, t.directionsVec);
 		t.horizontalDirection = getStringViewKey(elem, "direction") == "horizontal";
 		t.animType = getAnimationTypeKey(elem, "animationType");
 		t.refresh = getTimeKey(elem, "refresh");
@@ -589,8 +590,11 @@ namespace Parser
 		return texturePack;
 	}
 
-	void parseTexturePack(Game& game, const Value& elem)
+	void parseTexturePack(Game& game, const Value& elem,
+		const getTexturePackObjFuncPtr getTexturePackObjFunc)
 	{
+		assert(getTexturePackObjFunc != nullptr);
+
 		if (parseTexturePackFromId(game, elem) == true)
 		{
 			return;
@@ -620,11 +624,16 @@ namespace Parser
 		{
 			return;
 		}
-		auto texturePack = getTexturePackObj(game, elem);
+		auto texturePack = getTexturePackObjFunc(game, elem);
 		if (texturePack == nullptr)
 		{
 			return;
 		}
 		game.Resources().addTexturePack(id, std::move(texturePack), getStringViewKey(elem, "resource"));
+	}
+
+	void parseTexturePack(Game& game, const Value& elem)
+	{
+		parseTexturePack(game, elem, getTexturePackObj);
 	}
 }

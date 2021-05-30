@@ -1,24 +1,16 @@
 #include "ParseImageContainer.h"
+#include <cassert>
+#include "FileBytes.h"
 #include "FileUtils.h"
 #include "Game.h"
+#include "Hooks.h"
 #include "ImageContainers/SimpleImageContainer.h"
 #include "Utils/ParseUtils.h"
-#include "Utils/Utils.h"
 
 namespace Parser
 {
 	using namespace rapidjson;
 	using namespace std::literals;
-
-	enum class ImageContainerType
-	{
-		Simple
-	};
-
-	ImageContainerType getImageContainerType(const std::string_view fileName, const Value& elem)
-	{
-		return ImageContainerType::Simple;
-	}
 
 	std::shared_ptr<ImageContainer> getImageContainerObj(Game& game, const Value& elem)
 	{
@@ -40,17 +32,13 @@ namespace Parser
 
 		std::shared_ptr<ImageContainer> imgContainer;
 
-		switch (getImageContainerType(fileName, elem))
-		{
-		case ImageContainerType::Simple:
-		default:
+		if (Hooks::GetImageContainerObj == nullptr ||
+			Hooks::GetImageContainerObj(fileBytes, fileName, elem, imgContainer) == false)
 		{
 			auto frames = getFramesKey(elem, "frames");
 			auto directions = getUIntKey(elem, "directions");
 			imgContainer = std::make_shared<SimpleImageContainer>(
 				fileName, frames.first, frames.second, directions, false);
-			break;
-		}
 		}
 
 		if (imgContainer->size() == 0)
@@ -83,8 +71,11 @@ namespace Parser
 		return false;
 	}
 
-	void parseImageContainer(Game& game, const Value& elem)
+	void parseImageContainer(Game& game, const Value& elem,
+		const getImageContainerObjFuncPtr getImageContainerObjFunc)
 	{
+		assert(getImageContainerObjFunc != nullptr);
+
 		if (parseImageContainerFromId(game, elem) == true)
 		{
 			return;
@@ -114,11 +105,16 @@ namespace Parser
 		{
 			return;
 		}
-		auto imgRes = getImageContainerObj(game, elem);
-		if (imgRes == nullptr)
+		auto imageContainer = getImageContainerObjFunc(game, elem);
+		if (imageContainer == nullptr)
 		{
 			return;
 		}
-		game.Resources().addImageContainer(id, imgRes, getStringViewKey(elem, "resource"));
+		game.Resources().addImageContainer(id, imageContainer, getStringViewKey(elem, "resource"));
+	}
+
+	void parseImageContainer(Game& game, const Value& elem)
+	{
+		parseImageContainer(game, elem, getImageContainerObj);
 	}
 }

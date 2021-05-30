@@ -29,10 +29,11 @@ namespace sf
 {
 	class PhysFSStream : public sf::InputStream, public sf::NonCopyable
 	{
-	private:
+	protected:
 		PHYSFS_File* file{ nullptr };
 
 	public:
+		PhysFSStream() {}
 		PhysFSStream(const std::string_view fileName);
 		~PhysFSStream() override;
 

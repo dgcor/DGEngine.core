@@ -1,10 +1,10 @@
 #include "UIObject.h"
 #include "Utils/Utils.h"
 
-bool UIObject::getUIObjProp(const uint16_t propHash16,
+bool UIObject::getUIObjProp(const uint16_t propHash,
 	const std::string_view prop, Variable& var) const
 {
-	switch (propHash16)
+	switch (propHash)
 	{
 	case str2int16("position"):
 	{

@@ -11,7 +11,7 @@ jobs:
     name: linux build
     runs-on: ubuntu-20.04
     steps:
-    - name: Checkout DGEngine
+    - name: Checkout DGEngine.core
       uses: actions/checkout@v2
 
     - name: Restore cached dependencies
@@ -41,7 +41,7 @@ jobs:
         cd /home/runner/work/sfml
         sudo make install
 
-    - name: CMake + make DGEngine
+    - name: CMake + make DGEngine.core
       run: |
         export CC=/usr/bin/gcc-11
         export CXX=/usr/bin/g++-11
@@ -52,7 +52,7 @@ jobs:
     name: windows build
     runs-on: windows-2019
     steps:
-    - name: Checkout DGEngine
+    - name: Checkout DGEngine.core
       uses: actions/checkout@v2
 
     - name: Restore cached dependencies
@@ -69,7 +69,7 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: MSBuild DGEngine
+    - name: MSBuild DGEngine.core
       run: |
         vcpkg integrate install
-        msbuild Project.vcxproj /p:Configuration="Release Static NoMovie" /p:Platform=Win32
+        msbuild DGEngine.core.vcxproj /p:Configuration="Release Static NoMovie" /p:Platform=Win32

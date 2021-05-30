@@ -29,8 +29,8 @@
 #include "Actions/ActText.h"
 #include "Actions/ActVariable.h"
 #include "Actions/ActVisibility.h"
+#include "Hooks.h"
 #include "Json/JsonUtils.h"
-#include "ParseActionGame.h"
 #include "ParseCondition.h"
 #include "Utils/ParseUtils.h"
 
@@ -1226,7 +1226,16 @@ namespace Parser
 				getBoolKey(elem, "resolveValue", true));
 		}
 		default:
-			return parseActionGameElem(game, nameHash, elem);
+		{
+			if (Hooks::ParseActionElem != nullptr)
+			{
+				return Hooks::ParseActionElem(game, nameHash, elem);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
 		}
 	}
 

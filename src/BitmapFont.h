@@ -12,7 +12,7 @@ class TexturePack;
 
 class BitmapFont
 {
-private:
+protected:
 	std::shared_ptr<TexturePack> texturePack;
 	std::shared_ptr<Palette> palette;
 	sf::Color defaultColor{ sf::Color::White };
@@ -32,6 +32,7 @@ private:
 public:
 	BitmapFont(const std::shared_ptr<TexturePack>& texturePack_,
 		int16_t newLine_, int16_t space_, int16_t tab_);
+	virtual ~BitmapFont() = default;
 
 	int getNewLine() const noexcept { return newLine; }
 
@@ -51,7 +52,7 @@ public:
 		const std::string_view text, sf::Color color, int horizSpaceOffset,
 		int vertSpaceOffset, float sizeX, HorizontalAlign align) const;
 
-	void draw(const VertexArray2& vertexText,
+	virtual void draw(const VertexArray2& vertexText,
 		const sf::Vector2f& pos, const sf::Vector2f& size,
 		GameShader* spriteShader, sf::RenderTarget& target) const;
 };

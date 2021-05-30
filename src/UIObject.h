@@ -12,7 +12,7 @@ class UIObject : public virtual Queryable
 {
 protected:
 	// gets common getProperty properties.
-	bool getUIObjProp(const uint16_t propHash16,
+	bool getUIObjProp(const uint16_t propHash,
 		const std::string_view prop, Variable& var) const;
 
 public:

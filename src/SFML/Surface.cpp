@@ -1,61 +1,61 @@
-#include "LevelSurface.h"
+#include "Surface.h"
 #include "Game.h"
 #include "Panel.h"
 #include "Utils/Utils.h"
 
-Anchor LevelSurface::getAnchor() const noexcept
+Anchor Surface::getAnchor() const noexcept
 {
 	return mapView.getAnchor();
 }
 
-void LevelSurface::setAnchor(const Anchor anchor_) noexcept
+void Surface::setAnchor(const Anchor anchor_) noexcept
 {
 	mapView.setAnchor(anchor_);
 	drawView.setAnchor(anchor_);
 }
 
-const sf::Vector2f& LevelSurface::Position() const noexcept
+const sf::Vector2f& Surface::Position() const noexcept
 {
 	return mapView.getPosition();
 }
 
-void LevelSurface::Position(const sf::Vector2f& position)
+void Surface::Position(const sf::Vector2f& position)
 {
 	mapView.setPosition(position);
 	drawView.setPosition(position);
 	sprite.setPosition(position);
 }
 
-const sf::Vector2f& LevelSurface::Size() const noexcept
+const sf::Vector2f& Surface::Size() const noexcept
 {
 	return mapView.getSize();
 }
 
-void LevelSurface::Size(const sf::Vector2f& size_)
+void Surface::Size(const sf::Vector2f& size_)
 {
 	mapView.setSize(size_);
 	drawView.setSize(size_);
 	sprite.setSize(drawView.getRoundedSize());
 }
 
-const sf::Vector2f& LevelSurface::getCenter() const
+const sf::Vector2f& Surface::getCenter() const
 {
 	return mapView.getCenter();
 }
 
-void LevelSurface::setCenter(float newViewCenterX, float newViewCenterY)
+void Surface::setCenter(float newViewCenterX, float newViewCenterY)
 {
 	mapView.setCenter(newViewCenterX, newViewCenterY);
 	drawView.setCenter(newViewCenterX, newViewCenterY);
 	updateVisibleArea();
 }
 
-void LevelSurface::setCenter(const sf::Vector2f& center)
+void Surface::setCenter(const sf::Vector2f& center)
 {
 	setCenter(center.x, center.y);
 }
 
-void LevelSurface::setCenter()
+void Surface::setCenter()
 {
 	setCenter(
 		std::round(mapView.getRoundedSize().x / 2.f),
@@ -63,22 +63,22 @@ void LevelSurface::setCenter()
 	);
 }
 
-sf::Vector2f LevelSurface::getPosition(const sf::Vector2f& point) const
+sf::Vector2f Surface::getPosition(const sf::Vector2f& point) const
 {
 	return mapView.getPosition(point);
 }
 
-sf::Vector2f LevelSurface::getDrawPosition(const sf::Vector2f& point) const
+sf::Vector2f Surface::getDrawPosition(const sf::Vector2f& point) const
 {
 	return mapView.getDrawPosition(point);
 }
 
-float LevelSurface::getZoom() const
+float Surface::getZoom() const
 {
 	return mapView.getZoom();
 }
 
-void LevelSurface::recreateRenderTexture(bool smoothTexture)
+void Surface::recreateRenderTexture(bool smoothTexture)
 {
 	if (supportsBigTextures == true && mapView.getZoom() > 1.f)
 	{
@@ -98,7 +98,7 @@ void LevelSurface::recreateRenderTexture(bool smoothTexture)
 	}
 }
 
-void LevelSurface::recreateRenderTexture(unsigned newWidth, unsigned newHeight, bool smoothTexture)
+void Surface::recreateRenderTexture(unsigned newWidth, unsigned newHeight, bool smoothTexture)
 {
 	auto texSize = texture.getSize();
 	if ((texSize.x != newWidth || texSize.y != newHeight) &&
@@ -111,7 +111,7 @@ void LevelSurface::recreateRenderTexture(unsigned newWidth, unsigned newHeight, 
 	}
 }
 
-void LevelSurface::updateVisibleArea()
+void Surface::updateVisibleArea()
 {
 	const auto& viewCenter = mapView.getCenter();
 	const auto& viewSize = mapView.getVisibleSize();
@@ -121,7 +121,7 @@ void LevelSurface::updateVisibleArea()
 	visibleRect.height = std::round(viewSize.y);
 }
 
-void LevelSurface::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Surface::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if (visible == true)
 	{
@@ -130,34 +130,34 @@ void LevelSurface::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-bool LevelSurface::draw(const Game& game, const Panel& obj) const
+bool Surface::draw(const Game& game, const Panel& obj) const
 {
 	return obj.draw(game, texture, visibleRect);
 }
 
-void LevelSurface::draw(const Game& game, const UIObject& obj) const
+void Surface::draw(const Game& game, const UIObject& obj) const
 {
 	return obj.draw(game, texture);
 }
 
-void LevelSurface::draw(const sf::Drawable& obj, sf::RenderStates states) const
+void Surface::draw(const sf::Drawable& obj, sf::RenderStates states) const
 {
 	texture.draw(obj, states);
 }
 
-void LevelSurface::draw(const Sprite2& obj, GameShader* spriteShader,
+void Surface::draw(const Sprite2& obj, GameShader* spriteShader,
 	SpriteShaderCache& cache) const
 {
 	obj.draw(texture, spriteShader, &cache);
 }
 
-void LevelSurface::draw(const VertexArray2& obj, const sf::Texture* vertexTexture,
+void Surface::draw(const VertexArray2& obj, const sf::Texture* vertexTexture,
 	const Palette* palette, GameShader* spriteShader) const
 {
 	obj.draw(vertexTexture, palette, spriteShader, texture);
 }
 
-void LevelSurface::init(const Game& game)
+void Surface::init(const Game& game)
 {
 	auto maxTexSize = std::max(
 		sf::VideoMode::getDesktopMode().width * 2,
@@ -168,12 +168,12 @@ void LevelSurface::init(const Game& game)
 	recreateRenderTexture(game.SmoothScreen());
 }
 
-void LevelSurface::clear(const sf::Color& color) const
+void Surface::clear(const sf::Color& color) const
 {
 	texture.clear(color);
 }
 
-bool LevelSurface::updateZoom(const Game& game, float newZoom)
+bool Surface::updateZoom(const Game& game, float newZoom)
 {
 	newZoom = Utils::round(newZoom, 4);
 	if (newZoom != mapView.getZoom())
@@ -194,7 +194,7 @@ bool LevelSurface::updateZoom(const Game& game, float newZoom)
 	return false;
 }
 
-void LevelSurface::stretchSpriteToZoom(float zoom)
+void Surface::stretchSpriteToZoom(float zoom)
 {
 	if (zoom > 1.f)
 	{
@@ -227,7 +227,7 @@ void LevelSurface::stretchSpriteToZoom(float zoom)
 	}
 }
 
-void LevelSurface::updateSize(const Game& game)
+void Surface::updateSize(const Game& game)
 {
 	mapView.updateSize(game, true);
 	drawView.updateSize(game, true);
@@ -239,7 +239,7 @@ void LevelSurface::updateSize(const Game& game)
 	stretchSpriteToZoom(mapView.getZoom());
 }
 
-void LevelSurface::updateView(const Game& game)
+void Surface::updateView(const Game& game)
 {
 	mapView.update(game, true);
 	drawView.update(game, true);
@@ -249,12 +249,12 @@ void LevelSurface::updateView(const Game& game)
 	stretchSpriteToZoom(mapView.getZoom());
 }
 
-void LevelSurface::updateDrawView() const
+void Surface::updateDrawView() const
 {
 	texture.setView(drawView.getView());
 }
 
-void LevelSurface::updateDrawView(const sf::FloatRect& viewportOffset) const
+void Surface::updateDrawView(const sf::FloatRect& viewportOffset) const
 {
 	if (viewportOffset == sf::FloatRect(0.f, 0.f, 0.f, 0.f) ||
 		mapView.getZoom() != 1.f)

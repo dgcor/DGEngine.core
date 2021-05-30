@@ -1,6 +1,6 @@
-#include "ParseImage.h"
+#include "ParsePanel.h"
+#include <cassert>
 #include "Game.h"
-#include "Game/Level.h"
 #include "GameUtils.h"
 #include "Panel.h"
 #include "Utils/ParseUtils.h"
@@ -10,18 +10,8 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parsePanel(Game& game, const Value& elem)
+	std::shared_ptr<Panel> getPanelObj(Game& game, const Value& elem)
 	{
-		if (isValidString(elem, "id") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		auto panel = std::make_shared<Panel>(getBoolKey(elem, "relativePositions"));
 
 		auto anchor = getAnchorKey(elem, "anchor");
@@ -36,10 +26,37 @@ namespace Parser
 		panel->Position(pos);
 		panel->Visible(getBoolKey(elem, "visible", true));
 
-		bool manageObjDrawing = true;
+		return panel;
+	}
+
+	void parsePanel(Game& game, const Value& elem,
+		const getPanelObjFuncPtr getPanelObjFunc)
+	{
+		assert(getPanelObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto panel = getPanelObjFunc(game, elem);
+		if (panel == nullptr)
+		{
+			return;
+		}
 
 		game.Resources().addDrawable(
-			id, panel, manageObjDrawing, getStringViewKey(elem, "resource")
+			id, panel, true, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parsePanel(Game& game, const Value& elem)
+	{
+		parsePanel(game, elem, getPanelObj);
 	}
 }

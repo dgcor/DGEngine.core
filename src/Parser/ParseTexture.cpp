@@ -1,5 +1,7 @@
 #include "ParseTexture.h"
+#include <cassert>
 #include "Game.h"
+#include "Hooks.h"
 #include "ImageUtils.h"
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -23,9 +25,9 @@ namespace Parser
 				colorElem.Size() == (size.x * size.y))
 			{
 				img.create(size.x, size.y);
-				for (size_t j = 0; j < size.y; j++)
+				for (unsigned j = 0; j < size.y; j++)
 				{
-					for (size_t i = 0; i < size.x; i++)
+					for (unsigned i = 0; i < size.x; i++)
 					{
 						img.setPixel(i, j, getColorVal(colorElem[i + j * size.y]));
 					}
@@ -42,24 +44,28 @@ namespace Parser
 			return img;
 		}
 
-		auto path = getStringViewVal(elem["file"sv]);
-		auto mask = getColorKey(elem, "mask", sf::Color::Transparent);
-		img = ImageUtils::loadImage(path, mask);
-
-		if (isValidString(elem, "split") == true)
+		if (Hooks::ParseTextureImg == nullptr ||
+			Hooks::ParseTextureImg(game, elem, img) == false)
 		{
-			auto split = getStringViewVal(elem["split"sv]);
-			auto piecesX = getUIntKey(elem, "pieces", 1);
+			auto path = getStringViewVal(elem["file"sv]);
+			auto mask = getColorKey(elem, "mask", sf::Color::Transparent);
+			img = ImageUtils::loadImage(path, mask);
+			if (isValidString(elem, "split") == true)
+			{
+				auto split = getStringViewVal(elem["split"sv]);
+				auto piecesX = getUIntKey(elem, "pieces", 1);
 
-			if (split == "horizontal")
-			{
-				img = ImageUtils::splitImageHorizontal(img, piecesX);
-			}
-			else if (split == "vertical")
-			{
-				img = ImageUtils::splitImageVertical(img, piecesX);
+				if (split == "horizontal")
+				{
+					img = ImageUtils::splitImageHorizontal(img, piecesX);
+				}
+				else if (split == "vertical")
+				{
+					img = ImageUtils::splitImageVertical(img, piecesX);
+				}
 			}
 		}
+
 		if (isValidArray(elem, "trim") == true)
 		{
 			auto trimRect = getIntRectVal(elem["trim"sv]);
@@ -121,8 +127,11 @@ namespace Parser
 		return texture;
 	}
 
-	void parseTexture(Game& game, const Value& elem)
+	void parseTexture(Game& game, const Value& elem,
+		const getTextureObjFuncPtr getTextureObjFunc)
 	{
+		assert(getTextureObjFunc != nullptr);
+
 		if (parseTextureFromId(game, elem) == true)
 		{
 			return;
@@ -148,11 +157,16 @@ namespace Parser
 		{
 			return;
 		}
-		auto texture = getTextureObj(game, elem);
+		auto texture = getTextureObjFunc(game, elem);
 		if (texture == nullptr)
 		{
 			return;
 		}
 		game.Resources().addTexture(id, texture, getStringViewKey(elem, "resource"));
+	}
+
+	void parseTexture(Game& game, const Value& elem)
+	{
+		parseTexture(game, elem, getTextureObj);
 	}
 }

@@ -1,5 +1,6 @@
 #include "ParseAnimation.h"
 #include "Animation.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include "Panel.h"
@@ -90,8 +91,11 @@ namespace Parser
 		return animation;
 	}
 
-	void parseAnimation(Game& game, const Value& elem)
+	void parseAnimation(Game& game, const Value& elem,
+		const getAnimationObjFuncPtr getAnimationObjFunc)
 	{
+		assert(getAnimationObjFunc != nullptr);
+
 		if (isValidString(elem, "id") == false)
 		{
 			return;
@@ -101,7 +105,8 @@ namespace Parser
 		{
 			return;
 		}
-		auto animation = getAnimationObj(game, elem);
+
+		auto animation = getAnimationObjFunc(game, elem);
 		if (animation == nullptr)
 		{
 			return;
@@ -121,5 +126,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, animation, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseAnimation(Game& game, const Value& elem)
+	{
+		parseAnimation(game, elem, getAnimationObj);
 	}
 }

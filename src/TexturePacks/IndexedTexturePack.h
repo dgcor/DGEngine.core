@@ -7,6 +7,7 @@
 
 class IndexedTexturePack : public TexturePack
 {
+protected:
 	struct TexturePackAnimation
 	{
 		ElapsedTime refresh;

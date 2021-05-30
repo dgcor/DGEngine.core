@@ -1,4 +1,5 @@
 #include "ParseInputText.h"
+#include <cassert>
 #include "Game.h"
 #include "InputText.h"
 #include "Panel.h"
@@ -12,19 +13,13 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseInputText(Game& game, const Value& elem)
+	std::shared_ptr<InputText> getInputTextObj(Game& game, const Value& elem)
 	{
-		if (isValidString(elem, "id") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		auto text = getDrawableTextObj(game, elem);
+		if (text == nullptr)
+		{
+			return nullptr;
+		}
 		auto inputText = std::make_shared<InputText>(std::move(text));
 
 		if (elem.HasMember("minLength"sv) == true)
@@ -60,6 +55,29 @@ namespace Parser
 		{
 			inputText->setAction(str2int16("minLength"), getActionVal(game, elem["onMinLength"sv]));
 		}
+		return inputText;
+	}
+
+	void parseInputText(Game& game, const Value& elem,
+		const getInputTextObjFuncPtr getInputTextObjFunc)
+	{
+		assert(getInputTextObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto inputText = getInputTextObjFunc(game, elem);
+		if (inputText == nullptr)
+		{
+			return;
+		}
 
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
@@ -75,5 +93,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, inputText, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseInputText(Game& game, const Value& elem)
+	{
+		parseInputText(game, elem, getInputTextObj);
 	}
 }

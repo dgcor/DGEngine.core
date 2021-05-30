@@ -1,6 +1,7 @@
 #include "ParseButton.h"
 #include "BitmapButton.h"
 #include "BitmapText.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include "Panel.h"
@@ -61,6 +62,22 @@ namespace Parser
 		button->setOutline(outline, outlineIgnore);
 		button->setOutlineEnabled(getBoolKey(elem, "enableOutline"));
 
+		auto anchor = getAnchorKey(elem, "anchor");
+		button->setAnchor(anchor);
+		auto size = button->Size();
+		auto pos = getPositionKey(elem, "position", size, game.RefSize());
+		if (getBoolKey(elem, "relativeCoords", true) == true &&
+			game.RefSize() != game.DrawRegionSize())
+		{
+			GameUtils::setAnchorPosSize(anchor, pos, size, game.RefSize(), game.DrawRegionSize());
+		}
+		button->Position(pos);
+		auto bitmapBtn = static_cast<BitmapButton*>(button.get());
+		bitmapBtn->Size(size);
+		button->Visible(getBoolKey(elem, "visible", true));
+
+		button->setColor(getColorKey(elem, "color", sf::Color::White));
+
 		return button;
 	}
 
@@ -76,8 +93,23 @@ namespace Parser
 		return button;
 	}
 
-	void parseButton(Game& game, const Value& elem)
+	std::shared_ptr<Button> parseButtonObj(Game& game, const Value& elem)
 	{
+		if (elem.HasMember("font"sv) == false)
+		{
+			return parseBitmapButton(game, elem);
+		}
+		else
+		{
+			return parseStringButton(game, elem);
+		}
+	}
+
+	void parseButton(Game& game, const Value& elem,
+		const parseButtonObjFuncPtr parseButtonObjFunc)
+	{
+		assert(parseButtonObjFunc != nullptr);
+
 		if (isValidString(elem, "id") == false)
 		{
 			return;
@@ -88,34 +120,7 @@ namespace Parser
 			return;
 		}
 
-		std::shared_ptr<Button> button;
-
-		if (elem.HasMember("font"sv) == false)
-		{
-			button = parseBitmapButton(game, elem);
-			if (button != nullptr)
-			{
-				auto anchor = getAnchorKey(elem, "anchor");
-				button->setAnchor(anchor);
-				auto size = button->Size();
-				auto pos = getPositionKey(elem, "position", size, game.RefSize());
-				if (getBoolKey(elem, "relativeCoords", true) == true &&
-					game.RefSize() != game.DrawRegionSize())
-				{
-					GameUtils::setAnchorPosSize(anchor, pos, size, game.RefSize(), game.DrawRegionSize());
-				}
-				button->Position(pos);
-				auto bitmapBtn = static_cast<BitmapButton*>(button.get());
-				bitmapBtn->Size(size);
-				button->Visible(getBoolKey(elem, "visible", true));
-
-				button->setColor(getColorKey(elem, "color", sf::Color::White));
-			}
-		}
-		else
-		{
-			button = parseStringButton(game, elem);
-		}
+		auto button = parseButtonObjFunc(game, elem);
 		if (button == nullptr)
 		{
 			return;
@@ -197,5 +202,10 @@ namespace Parser
 			button->focusEnabled(getBoolKey(elem, "focusOnClick", true));
 			game.Resources().addFocused(button, resource);
 		}
+	}
+
+	void parseButton(Game& game, const Value& elem)
+	{
+		parseButton(game, elem, parseButtonObj);
 	}
 }

@@ -25,7 +25,6 @@
 
 class Button;
 class Image;
-class Level;
 
 struct ResourceBundle
 {
@@ -93,7 +92,7 @@ private:
 	std::vector<std::shared_ptr<Image>> cursors;
 	std::vector<uint16_t> activeInputEvents;
 	std::list<sf::Sound> playingSounds;
-	Level* currentLevel{ nullptr };
+	UIObject* currentLevel{ nullptr };
 	size_t currentLevelResourceIdx{ 0 };
 
 	void clearCurrentLevel() noexcept
@@ -201,7 +200,7 @@ public:
 	ShaderManager& Shaders() { return shaders; };
 	const ShaderManager& Shaders() const { return shaders; };
 
-	void setCurrentLevel(Level* level) noexcept
+	void setCurrentLevel(UIObject* level) noexcept
 	{
 		currentLevel = level;
 		currentLevelResourceIdx = resources.size() - 1;
@@ -217,8 +216,20 @@ public:
 	void bringResourceToFront(const std::string& id);
 
 	Image* getCursor() const;
-	Level* getCurrentLevel() const noexcept { return currentLevel; }
-	Level* getLevel(const std::string_view id) const noexcept;
+
+	template <class T>
+	T* getCurrentLevel() const noexcept { return (T*)currentLevel; }
+
+	template <class T>
+	T* getLevel(const std::string_view id) const noexcept
+	{
+		if (id.empty() == true)
+		{
+			return (T*)currentLevel;
+		}
+		return getDrawable<T>(id);
+	}
+
 	void addCursor(const std::shared_ptr<Image>& cursor_) { cursors.push_back(cursor_); }
 	void popCursor(bool popAll = false);
 	void popAllCursors() noexcept { cursors.clear(); }

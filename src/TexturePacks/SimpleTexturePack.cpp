@@ -40,7 +40,7 @@ static bool makeTexturePack(MultiTexture& t, const std::pair<uint32_t, uint32_t>
 	}
 	else
 	{
-		t.directions = t.directionsVec.size();
+		t.directions = (uint32_t)t.directionsVec.size();
 	}
 	return true;
 }
@@ -199,7 +199,7 @@ SimpleTexturePack::SimpleTexturePack(MultiTexture&& t_,
 	t.subImageSizeY = imgSize.y;
 	if (t.directionsVec.empty() == false)
 	{
-		t.directions = t.directionsVec.size();
+		t.directions = (uint32_t)t.directionsVec.size();
 	}
 	else
 	{

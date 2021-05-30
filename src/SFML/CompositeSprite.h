@@ -8,13 +8,14 @@ class CompositeSprite
 private:
 	Sprite2 sprite;
 	std::vector<Sprite2> extraSprites;
+	bool drawAfterExtraSprites{ false };
 
 public:
 	CompositeSprite() = default;
 	CompositeSprite(const sf::Texture& tex) : sprite(tex) {}
 	CompositeSprite(const sf::Texture& tex, const std::shared_ptr<Palette>& pal) : sprite(tex, pal) {}
 	CompositeSprite(const TextureInfo& ti);
-	CompositeSprite(const std::vector<TextureInfo>& ti);
+	CompositeSprite(const std::vector<TextureInfo>& ti, bool drawAfter = false);
 
 	const sf::Vector2f& getDrawPosition() const { return sprite.getDrawPosition(); }
 	const sf::Vector2f& getPosition() const { return sprite.getPosition(); }
@@ -51,7 +52,7 @@ public:
 	const sf::Texture* getTexture() const { return sprite.getTexture(); }
 	void setTexture(const sf::Texture& texture, bool resetRect = false);
 	void setTexture(const TextureInfo& ti);
-	void setTexture(const std::vector<TextureInfo>& ti);
+	void setTexture(const std::vector<TextureInfo>& ti, bool drawAfter = false);
 	void setTexture(const TextureInfoVar& ti);
 
 	void draw(sf::RenderTarget& target, GameShader* spriteShader) const;

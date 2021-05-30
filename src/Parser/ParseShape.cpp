@@ -1,4 +1,5 @@
 #include "ParseShape.h"
+#include <cassert>
 #include "Game.h"
 #include "GameUtils.h"
 #include "Panel.h"
@@ -10,19 +11,8 @@ namespace Parser
 	using namespace rapidjson;
 	using namespace std::literals;
 
-	void parseShape(Game& game, const Value& elem)
+	std::shared_ptr<Shape> getShapeObj(Game& game, const Value& elem)
 	{
-		if (isValidString(elem, "id") == false ||
-			isValidArray(elem, "vertices") == false)
-		{
-			return;
-		}
-		auto id = elem["id"sv].GetStringView();
-		if (isValidId(id) == false)
-		{
-			return;
-		}
-
 		auto shape = std::make_shared<Shape>(getPrimitiveTypeKey(elem, "type"));
 
 		for (const auto& val : elem["vertices"sv])
@@ -35,7 +25,7 @@ namespace Parser
 
 		if (shape->getPointCount() == 0)
 		{
-			return;
+			return nullptr;
 		}
 
 		auto anchor = getAnchorKey(elem, "anchor");
@@ -51,6 +41,31 @@ namespace Parser
 		shape->Size(size);
 		shape->Visible(getBoolKey(elem, "visible", true));
 
+		return shape;
+	}
+
+	void parseShape(Game& game, const Value& elem,
+		const getShapeObjFuncPtr getShapeObjFunc)
+	{
+		assert(getShapeObjFunc != nullptr);
+
+		if (isValidString(elem, "id") == false ||
+			isValidArray(elem, "vertices") == false)
+		{
+			return;
+		}
+		auto id = elem["id"sv].GetStringView();
+		if (isValidId(id) == false)
+		{
+			return;
+		}
+
+		auto shape = getShapeObjFunc(game, elem);
+		if (shape == nullptr)
+		{
+			return;
+		}
+
 		bool manageObjDrawing = true;
 		if (isValidString(elem, "panel") == true)
 		{
@@ -65,5 +80,10 @@ namespace Parser
 		game.Resources().addDrawable(
 			id, shape, manageObjDrawing, getStringViewKey(elem, "resource")
 		);
+	}
+
+	void parseShape(Game& game, const Value& elem)
+	{
+		parseShape(game, elem, getShapeObj);
 	}
 }

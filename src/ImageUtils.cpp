@@ -1,5 +1,6 @@
 #include "ImageUtils.h"
 #include "CachedImagePack.h"
+#include "Hooks.h"
 #include "SFML/PhysFSStream.h"
 #include "Utils/NumberVector.h"
 
@@ -40,7 +41,11 @@ namespace ImageUtils
 			return image;
 		}
 
-		image.loadFromStream(file);
+		if (Hooks::DecodeImage == nullptr ||
+			Hooks::DecodeImage(file, image) == false)
+		{
+			image.loadFromStream(file);
+		}
 		applyMask(image, transparencyMask);
 		return image;
 	}
@@ -55,9 +60,9 @@ namespace ImageUtils
 
 		CachedImagePack imgCache(&imgContainer, pal);
 
-		size_t imgWidth = 0;
-		size_t imgHeight = 0;
-		for (size_t i = 0; i < imgCache.size(); i++)
+		unsigned imgWidth = 0;
+		unsigned imgHeight = 0;
+		for (uint32_t i = 0; i < imgCache.size(); i++)
 		{
 			auto frameSize = imgCache[i].getSize();
 			if (imgWidth < frameSize.x)
@@ -70,14 +75,14 @@ namespace ImageUtils
 		sf::Image img;
 		img.create(imgWidth, imgHeight, sf::Color::Transparent);
 
-		size_t maxHeight = 0;
-		for (size_t fr = 0; fr < imgCache.size(); fr++)
+		unsigned maxHeight = 0;
+		for (uint32_t fr = 0; fr < imgCache.size(); fr++)
 		{
 			const auto& frame = imgCache[fr];
 			auto frameSize = frame.getSize();
-			for (size_t j = 0; j < frameSize.y; j++)
+			for (unsigned j = 0; j < frameSize.y; j++)
 			{
-				for (size_t i = 0; i < frameSize.x; i++)
+				for (unsigned i = 0; i < frameSize.x; i++)
 				{
 					img.setPixel(i, maxHeight + j, frame.getPixel(i, j));
 				}
@@ -88,7 +93,7 @@ namespace ImageUtils
 	}
 
 	sf::Image loadImageFrame(const ImageContainer& imgContainer,
-		const PaletteArray* pal, size_t frameIdx)
+		const PaletteArray* pal, uint32_t frameIdx)
 	{
 		if (imgContainer.size() > 0 && frameIdx < imgContainer.size())
 		{
@@ -113,8 +118,8 @@ namespace ImageUtils
 		img.create(firstImgSize.x * 16, firstImgSize.y * 16, sf::Color::Transparent);
 		NumberVector<uint8_t> charMapping(fileNameCharMap, 0, 256);
 
-		size_t xx = 0;
-		size_t yy = 0;
+		unsigned xx = 0;
+		unsigned yy = 0;
 		for (auto charMap : charMapping.getContainer())
 		{
 			if (charMap != 0xFF && charMap < cacheSize)
@@ -122,9 +127,9 @@ namespace ImageUtils
 				const auto& frame = imgCache[charMap];
 				auto frameSize = frame.getSize();
 
-				for (size_t j = 0; j < frameSize.y; j++)
+				for (unsigned j = 0; j < frameSize.y; j++)
 				{
-					for (size_t i = 0; i < frameSize.x; i++)
+					for (unsigned i = 0; i < frameSize.x; i++)
 					{
 						img.setPixel(
 							frameSize.x * xx + i,

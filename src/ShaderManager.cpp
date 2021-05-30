@@ -1,7 +1,7 @@
 #include "ShaderManager.h"
 #include "Utils/Utils.h"
 
-const std::string ShaderManager::gameText{ R"(
+const std::string ShaderManager::gameShaderCode{ R"(
 #version 110
 uniform sampler2D texture;
 uniform vec4 fade;
@@ -20,7 +20,7 @@ void main()
 }
 )" };
 
-const std::string ShaderManager::levelText{ R"(
+const std::string ShaderManager::levelShaderCode{ R"(
 #version 110
 uniform sampler2D texture;
 
@@ -30,7 +30,7 @@ void main()
 }
 )" };
 
-const std::string ShaderManager::spriteText{ R"(
+const std::string ShaderManager::spriteShaderCode{ R"(
 #version 110
 uniform sampler2D palette;
 uniform sampler2D texture;
@@ -116,6 +116,33 @@ std::unique_ptr<sf::Shader> ShaderManager::makeShader(const std::string& fragmen
 	return {};
 }
 
+void ShaderManager::init(ShaderManager& shaderManager)
+{
+	GameShader gameShader;
+	gameShader.shader = makeShader(gameShaderCode);
+	gameShader.uniforms.push_back(str2int16("fade"));
+	gameShader.uniforms.push_back(str2int16("gamma"));
+	shaderManager.add("game", std::move(gameShader));
+
+	GameShader levelShader;
+	levelShader.shader = makeShader(levelShaderCode);
+	shaderManager.add("level", std::move(levelShader));
+
+	GameShader spriteShader;
+	spriteShader.shader = makeShader(spriteShaderCode);
+	spriteShader.uniforms.push_back(str2int16("palette"));
+	spriteShader.uniforms.push_back(str2int16("pixelSize"));
+	spriteShader.uniforms.push_back(str2int16("outline"));
+	shaderManager.add("sprite", std::move(spriteShader));
+}
+
+void ShaderManager::init(GameShaders& gameShaders) const
+{
+	gameShaders.Game = get("game");
+	gameShaders.Level = get("level");
+	gameShaders.Sprite = get("sprite");
+}
+
 void ShaderManager::add(const std::string_view id, GameShader&& shader)
 {
 	if (shaders.find(sv2str(id)) == shaders.end())
@@ -141,31 +168,4 @@ GameShader* ShaderManager::get(const std::string_view id) const
 bool ShaderManager::has(const std::string_view id) const
 {
 	return shaders.find(sv2str(id)) != shaders.end();
-}
-
-void ShaderManager::init()
-{
-	GameShader gameShader;
-	gameShader.shader = makeShader(gameText);
-	gameShader.uniforms.push_back(str2int16("fade"));
-	gameShader.uniforms.push_back(str2int16("gamma"));
-	add("game", std::move(gameShader));
-
-	GameShader levelShader;
-	levelShader.shader = makeShader(levelText);
-	add("level", std::move(levelShader));
-
-	GameShader spriteShader;
-	spriteShader.shader = makeShader(spriteText);
-	spriteShader.uniforms.push_back(str2int16("palette"));
-	spriteShader.uniforms.push_back(str2int16("pixelSize"));
-	spriteShader.uniforms.push_back(str2int16("outline"));
-	add("sprite", std::move(spriteShader));
-}
-
-void ShaderManager::init(GameShaders& gameShaders) const
-{
-	gameShaders.Game = get("game");
-	gameShaders.Level = get("level");
-	gameShaders.Sprite = get("sprite");
 }

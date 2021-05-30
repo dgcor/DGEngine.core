@@ -1,5 +1,5 @@
 #include "ParsePredicate.h"
-#include "ParsePredicateGame.h"
+#include "Hooks.h"
 #include "Predicates/PredIO.h"
 #include "Utils/ParseUtils.h"
 #include "Utils/Utils.h"
@@ -27,7 +27,16 @@ namespace Parser
 			return std::make_shared<PredGamefileExists>(getStringKey(elem, "file"));
 		}
 		default:
-			return getPredicateGameObj(game, nameHash, elem);
+		{
+			if (Hooks::GetPredicateObj != nullptr)
+			{
+				return Hooks::GetPredicateObj(game, nameHash, elem);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
 		}
 	}
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12.4 FATAL_ERROR)
 
-project(DGEngine)
+project(DGEngine.core VERSION 1.0.0)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
@@ -25,10 +25,9 @@ endif()
 find_package(PhysFS REQUIRED)
 find_package(SFML 2.5 REQUIRED system window graphics network audio)
 
-include_directories(./src)
+include_directories(src)
 
 set(SOURCE_FILES
-    src/Main.cpp
     src/Alignment.h
     src/Anchor.h
     src/Animation.cpp
@@ -72,11 +71,10 @@ set(SOURCE_FILES
     src/FreeTypeFont.h
     src/Game.cpp
     src/Game.h
-    src/GameConstants.h
     src/GameUtils.cpp
     src/GameUtils.h
-    src/GameUtilsGame.cpp
-    src/GameUtilsGame.h
+    src/Hooks.cpp
+    src/Hooks.h
     src/IfCondition.cpp
     src/IfCondition.h
     src/IgnoreResource.h
@@ -142,7 +140,6 @@ set(SOURCE_FILES
     src/Actions/ActIO.h
     src/Actions/Action.h
     src/Actions/ActiontList.h
-    src/Actions/ActLevel.h
     src/Actions/ActLoad.h
     src/Actions/ActLoadingScreen.h
     src/Actions/ActMenu.h
@@ -157,13 +154,6 @@ set(SOURCE_FILES
     src/Actions/ActText.h
     src/Actions/ActVariable.h
     src/Actions/ActVisibility.h
-    src/Game/GameProperties.h
-    src/Game/Level.cpp
-    src/Game/Level.h
-    src/Game/LevelSurface.cpp
-    src/Game/LevelSurface.h
-    src/Game/Save/SaveLevel.cpp
-    src/Game/Save/SaveLevel.h
     src/Game/Save/SaveProperties.h
     src/Game/Save/SaveUtils.cpp
     src/Game/Save/SaveUtils.h
@@ -175,8 +165,6 @@ set(SOURCE_FILES
     src/Json/JsonUtils.h
     src/Parser/ParseAction.cpp
     src/Parser/ParseAction.h
-    src/Parser/ParseActionGame.cpp
-    src/Parser/ParseActionGame.h
     src/Parser/ParseAnimation.cpp
     src/Parser/ParseAnimation.h
     src/Parser/ParseAudio.cpp
@@ -197,8 +185,6 @@ set(SOURCE_FILES
     src/Parser/ParseFile.h
     src/Parser/ParseFileBytes.cpp
     src/Parser/ParseFileBytes.h
-    src/Parser/ParseFileGame.cpp
-    src/Parser/ParseFileGame.h
     src/Parser/ParseFont.cpp
     src/Parser/ParseFont.h
     src/Parser/ParseIcon.cpp
@@ -227,8 +213,6 @@ set(SOURCE_FILES
     src/Parser/ParsePanel.h
     src/Parser/ParsePredicate.cpp
     src/Parser/ParsePredicate.h
-    src/Parser/ParsePredicateGame.cpp
-    src/Parser/ParsePredicateGame.h
     src/Parser/Parser.cpp
     src/Parser/Parser.h
     src/Parser/ParseRectangle.cpp
@@ -250,14 +234,8 @@ set(SOURCE_FILES
     src/Parser/ParseTexturePack.h
     src/Parser/ParseVariable.cpp
     src/Parser/ParseVariable.h
-    src/Parser/Game/ParseLevel.cpp
-    src/Parser/Game/ParseLevel.h
     src/Parser/Utils/ParseUtils.cpp
     src/Parser/Utils/ParseUtils.h
-    src/Parser/Utils/ParseUtilsGameKey.cpp
-    src/Parser/Utils/ParseUtilsGameKey.h
-    src/Parser/Utils/ParseUtilsGameVal.cpp
-    src/Parser/Utils/ParseUtilsGameVal.h
     src/Parser/Utils/ParseUtilsIdx.cpp
     src/Parser/Utils/ParseUtilsIdx.h
     src/Parser/Utils/ParseUtilsKey.cpp
@@ -280,6 +258,8 @@ set(SOURCE_FILES
     src/SFML/SFMLUtils.h
     src/SFML/Sprite2.cpp
     src/SFML/Sprite2.h
+    src/SFML/Surface.cpp
+    src/SFML/Surface.h
     src/SFML/Text2.cpp
     src/SFML/Text2.h
     src/SFML/VertexArray2.cpp
@@ -354,7 +334,9 @@ if(FALLBACK_TO_LOWERCASE)
     add_definitions(-DDGENGINE_FALLBACK_TO_LOWERCASE)
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_library(${PROJECT_NAME} ${SOURCE_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if(FFmpeg_FOUND)
     include_directories(${FFmpeg_INCLUDES})
